@@ -1,0 +1,1256 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>d:\00-AI-project · 主引导看板 v2.9（密码 770880）</title>
+<style>
+:root{
+  --bg:#0f1419; --bg-card:#161b22; --bg-elevated:#1c2128; --border:#30363d;
+  --text:#e6edf3; --text-muted:#8b949e; --text-dim:#6e7681;
+  --accent:#58a6ff; --success:#238636; --warning:#d29922; --danger:#da3633;
+  --purple:#a371f7; --cyan:#39c5cf; --code-bg:#0d1117; --code-text:#ffa657;
+  --red-bg:rgba(248,81,73,.12); --green-bg:rgba(46,160,67,.12);
+  --yellow-bg:rgba(227,179,65,.12); --blue-bg:rgba(56,139,253,.12);
+  --purple-bg:rgba(163,113,247,.12); --cyan-bg:rgba(57,197,207,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:24px 20px;font-size:14px}
+.container{max-width:1400px;margin:0 auto}
+h1{font-size:26px;margin-bottom:6px;letter-spacing:.5px}
+.subtitle{color:var(--text-muted);font-size:13px;margin-bottom:18px}
+.subtitle .sep{margin:0 8px;color:var(--border)}
+
+/* 顶部统计 */
+.stats-row{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:12px 14px}
+.stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-value{font-size:22px;font-weight:600;color:var(--accent)}
+.stat-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.stat-value.danger{color:var(--danger)}
+.stat-value.warning{color:var(--warning)}
+.stat-value.success{color:var(--success)}
+
+/* 顶部操作面板 */
+.action-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.action-info{flex:1;min-width:200px}
+.action-info .label{font-size:11px;color:var(--text-dim);text-transform:uppercase}
+.action-info .value{font-size:18px;color:var(--cyan);font-weight:600}
+.btn{padding:8px 14px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;color:var(--text);cursor:pointer;font-size:13px;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent);background:var(--blue-bg)}
+
+/* 标签页 */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto}
+.tab{padding:10px 16px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* 卡片与栅格 */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px}
+.grid{display:grid;gap:12px;margin-bottom:16px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.grid-3,.grid-4{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid-3,.grid-4,.grid-2{grid-template-columns:1fr}}
+
+h2{font-size:18px;margin:18px 0 10px;color:var(--accent);border-left:3px solid var(--accent);padding-left:10px}
+h3{font-size:15px;margin-bottom:8px;color:var(--text)}
+h4{font-size:14px;margin:8px 0 6px;color:var(--text-muted)}
+
+/* 徽章 */
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;margin-right:4px;font-weight:500}
+.badge-green{background:var(--green-bg);color:var(--success)}
+.badge-yellow{background:var(--yellow-bg);color:var(--warning)}
+.badge-red{background:var(--red-bg);color:var(--danger)}
+.badge-blue{background:var(--blue-bg);color:var(--accent)}
+.badge-purple{background:var(--purple-bg);color:var(--purple)}
+.badge-cyan{background:var(--cyan-bg);color:var(--cyan)}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--text-muted);font-weight:500;background:var(--bg-elevated)}
+tr:hover td{background:var(--bg-elevated)}
+code{background:var(--code-bg);color:var(--code-text);padding:1px 6px;border-radius:3px;font-family:Consolas,Monaco,monospace;font-size:12px}
+
+/* 工作流卡片 */
+.workflow{background:var(--bg-card);border-left:3px solid var(--cyan);border-radius:4px;padding:12px 14px;margin-bottom:10px}
+.workflow-title{color:var(--cyan);font-weight:600;margin-bottom:6px;font-size:14px}
+.workflow-triggers{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.trigger{background:var(--code-bg);padding:2px 8px;border-radius:3px;font-size:12px;color:var(--code-text)}
+.workflow-steps{font-size:12px;color:var(--text-muted);padding-left:18px;margin-top:6px}
+.workflow-steps li{margin-bottom:2px}
+
+/* 架构层卡片 */
+.arch-layer{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px}
+.arch-layer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.arch-layer-name{font-weight:600;color:var(--purple)}
+.arch-progress{font-size:12px;color:var(--accent)}
+
+/* 目录树 */
+.tree{font-family:Consolas,Monaco,monospace;font-size:12px;background:var(--code-bg);padding:12px;border-radius:4px;overflow-x:auto}
+.tree .folder{color:var(--cyan);cursor:pointer}
+.tree .file{color:var(--text-muted);padding-left:24px}
+.tree .desc{color:var(--text-dim);font-size:11px}
+
+/* 标签云 */
+.tag-cloud{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tag{background:var(--blue-bg);color:var(--accent);padding:3px 10px;border-radius:12px;font-size:11px}
+
+/* 进度条 */
+.progress-bar{background:var(--bg-elevated);border-radius:3px;height:6px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;background:var(--accent);transition:width .3s}
+.progress-fill.success{background:var(--success)}
+.progress-fill.warning{background:var(--warning)}
+
+/* 搜索框 */
+.search-box{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.search-box input{flex:1;background:transparent;border:none;color:var(--text);font-size:14px;outline:none}
+
+/* ASCII 架构图 */
+.arch-diagram{background:var(--code-bg);padding:14px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:11px;overflow-x:auto;color:var(--code-text);line-height:1.4;white-space:pre}
+
+/* ========== 密码门 ========== */
+.gate{position:fixed;inset:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:99999}
+.gate-box{background:#161b22;border-radius:20px;padding:40px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;border:1px solid #30363d}
+.gate-box h2{margin:0 0 8px;font-size:20px;color:#e6edf3}
+.gate-box .hint{color:#8b949e;font-size:12px;margin:0 0 20px}
+.pw-input{width:100%;padding:14px;font-size:18px;border:2px solid #30363d;border-radius:10px;text-align:center;letter-spacing:8px;font-weight:bold;outline:none;transition:border .2s;background:#0d1117;color:#e6edf3}
+.pw-input:focus{border-color:#58a6ff}
+.pw-input.error{border-color:#da3633;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pw-btn{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.pw-btn:active{opacity:.85}
+.pw-msg{color:#da3633;font-size:12px;margin-top:10px;min-height:16px}
+.lock-icon{font-size:36px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<!-- ========== 密码门 ========== -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <div class="lock-icon">🔒</div>
+    <h2>d: -AI-project 看板</h2>
+    <p class="hint">请输入 6 位访问密码</p>
+    <input id="pw" class="pw-input" type="password" inputmode="numeric" maxlength="6" placeholder="******" autocomplete="off">
+    <button id="pwBtn" class="pw-btn">进入</button>
+    <div id="pwMsg" class="pw-msg"></div>
+  </div>
+</div>
+
+<div class="container">
+
+<h1>🚀 d:\00-AI-project · 主引导看板 v2.9</h1>
+<p class="subtitle">
+  最后更新:2026-08-10 16:18 · v2.9 · 删 5 个重复话题 li + 重新跑推送链
+  <span class="sep">|</span><a href="file:///d:/00-AI-project/00-meta/主索引.md" class="btn" style="padding:4px 10px;font-size:11px">📄 主索引.md</a>
+</p>
+
+<!-- 顶部统计 -->
+<div class="stats-row">
+  <div class="stat">
+    <div class="stat-label">代码项目</div>
+    <div class="stat-value">4</div>
+    <div class="stat-sub">2 进行中 · 2 已完成（🆕 股票分析）</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">对话归档</div>
+    <div class="stat-value">15</div>
+    <div class="stat-sub">2026-08-07 → 2026-08-09</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Skill 数</div>
+    <div class="stat-value">31</div>
+    <div class="stat-sub">4 专用 + 2 部署 + 8 通用 + 3 内容 + 🆕14 官方</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Rules</div>
+    <div class="stat-value">5</div>
+    <div class="stat-sub">能量/看板/全自动/智能识别 + 🌙收工</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">看板 HTML</div>
+    <div class="stat-value">3</div>
+    <div class="stat-sub">主引导/Skill/项目全景</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">AI 系统进度</div>
+    <div class="stat-value success">62%</div>
+    <div class="stat-sub">21/34 模块 · M2 完成 🎉</div>
+    <div class="progress-bar"><div class="progress-fill success" style="width:68%"></div></div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">今日能量</div>
+    <div class="stat-value success">10/10</div>
+    <div class="stat-sub">极佳 · 适合攻坚</div>
+  </div>
+</div>
+
+<!-- 顶部操作面板 -->
+<div class="action-panel">
+  <div class="action-info">
+    <div class="label">看板版本</div>
+    <div class="value">v2.9 · 推送链内容真实性修复</div>
+  </div>
+  <div class="action-info">
+    <div class="label">生成时间</div>
+    <div class="value">2026-08-10 16:18</div>
+  </div>
+  <a href="javascript:window.print()" class="btn">🖨️ 打印 / 导出 PDF</a>
+  <a href="file:///d:/00-AI-project/00-meta/主索引.md" class="btn">📄 查看主索引</a>
+  <button class="btn" onclick="document.getElementById('search-input').focus()">🔍 快速搜索</button>
+</div>
+
+<!-- 搜索框 -->
+<div class="search-box">
+  <span>🔍</span>
+  <input id="search-input" placeholder="搜索项目 / Skill / 对话 / 标签...（Ctrl+F 也可）" onkeyup="filterCards(this.value)">
+</div>
+
+<!-- 标签页 -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('tab-1')">1. 定位与差异化</button>
+  <button class="tab" onclick="showTab('tab-2')">2. 5 层架构</button>
+  <button class="tab" onclick="showTab('tab-3')">3. 工作流入口</button>
+  <button class="tab" onclick="showTab('tab-4')">4. Rules & Skill</button>
+  <button class="tab" onclick="showTab('tab-5')">5. 项目 & 对话</button>
+  <button class="tab" onclick="showTab('tab-6')">6. 触发词速查</button>
+  <button class="tab" onclick="showTab('tab-7')">7. 标签 & 未来</button>
+  <button class="tab" onclick="showTab('tab-8')">8. 目录树</button>
+  <button class="tab" onclick="showTab('tab-9')">9. Token & 统计</button>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 1: 定位与差异化 -->
+<!-- ============================ -->
+<div id="tab-1" class="tab-content active">
+  <h2>一、个人 Agent 定位与差异化</h2>
+
+  <div class="card">
+    <h3>你的项目不是普通代码仓库,而是可被 AI 调度的个人效能系统</h3>
+    <ul style="padding-left:20px;color:var(--text-muted);font-size:13px;margin-top:8px">
+      <li>长期目标:打通飞书/微信/钉钉(暂不考虑钉钉)的全渠道 AI 助手</li>
+      <li>已动手:AI 个人效能系统(借鉴朋友 5 层架构)</li>
+      <li>业务项目:Excel 报价 / GMP 项目 / 🆕 股票分析(多氟多 002407)</li>
+      <li>行为准则:5 个 Cursor Rules 自动约束 AI 行为(含收工自动推送)</li>
+      <li>17 个 Skill 随时可用(4 项目专用 + 8 通用 + 3 内容 + 2 部署)</li>
+    </ul>
+  </div>
+
+  <h3>与"朋友架构"的 4 维差异</h3>
+  <table>
+    <thead>
+      <tr><th>维度</th><th>朋友方案</th><th>你的方案</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>项目范围</td>
+        <td>单项目(AI 系统内 5 层)</td>
+        <td><strong>多项目</strong>(AI 系统 + 业务项目)</td>
+      </tr>
+      <tr>
+        <td>Agent 引擎</td>
+        <td>单一项目内</td>
+        <td><strong>跨项目调度</strong>(AI 系统调 Excel/PPT/未来股票)</td>
+      </tr>
+      <tr>
+        <td>入口</td>
+        <td>Web UI</td>
+        <td><strong>Cursor + 飞书 + 微信</strong>(多渠道)</td>
+      </tr>
+      <tr>
+        <td>业务</td>
+        <td>通用助手</td>
+        <td><strong>垂直业务</strong>(报价 / GMP / 🆕股票)</td>
+      </tr>
+      <tr>
+        <td>行为约束</td>
+        <td>无 Rules</td>
+        <td><strong>5 个 Cursor Rules</strong>(能量/看板/全自动/智能识别 + 🌙收工)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 2: 5 层架构 -->
+<!-- ============================ -->
+<div id="tab-2" class="tab-content">
+  <h2>二、5 层架构 · 你的实现 vs 朋友标准</h2>
+
+  <div class="card">
+    <h3>完整架构图</h3>
+    <div class="arch-diagram">┌─────────────────────────────────────────────────────────┐
+│                    你(指挥者)                              │
+│         Cursor / 飞书 / 微信(多渠道入口)                    │
+└────────────────────────┬────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────┐
+│     🏠 00-meta/(个人 Agent 总控台)                        │
+│     主索引.md + 4 Rules + 17 Skill 注册                    │
+└────────────────────────┬────────────────────────────────┘
+                         ↓ 调度
+┌─────────────────────────────────────────────────────────┐
+│ ⚙️ AI 个人效能系统(你的"引擎")                            │
+│   02-CodeProjects/2026-08-08_AI个人效能系统/               │
+│                                                          │
+│   L5 交互层:Cursor对话(✅) → 飞书bot(📅) → 微信bot(📅)   │
+│   L4 Agent 引擎:LangGraph(⚠️ 0%)                         │
+│   L3 工具层:日程/任务/笔记/邮件/搜索(✅ 100% · 5 工具 + 25 endpoints)│
+│   L2 模型路由:OpenAI/Anthropic/Ollama(✅ 100%)                       │
+│   L1 数据层:PostgreSQL+Redis+Chroma(✅ 85%)                          │
+│                                                                    │
+│   进度:21/34 = 62% · M2 已完成(详见 § 七·项目概览)                │
+└──────────┬──────────────────────┬───────────────────────┘
+           ↓ 调用                  ↓ 调用
+┌──────────────────────┐  ┌─────────────────────────────┐
+│ 📂 业务项目(被调度)  │  │ 🛠️ 全局 Skill 库(17 个)     │
+│ • Excel 报价系统 ⭐   │  │ • fastapi-crud-generator   │
+│ • GMP 项目         │  │ • langgraph-agent-builder  │
+│ • 股票投资分析 📅    │  │ • fastapi-test-generator   │
+└──────────────────────┘  └─────────────────────────────┘</div>
+  </div>
+
+  <h3>5 层进度映射</h3>
+  <table>
+    <thead>
+      <tr><th>层</th><th>朋友标准</th><th>你现有</th><th>你未来</th><th>进度</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-purple">L5</span></td>
+        <td>Web UI</td>
+        <td>Swagger + Cursor 对话</td>
+        <td><strong>飞书/微信 bot</strong></td>
+        <td>50%</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">L4</span></td>
+        <td>LangGraph Agent</td>
+        <td>占位</td>
+        <td>ReAct + Plan-Execute</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">L3</span></td>
+        <td>5 工具</td>
+        <td><strong>日程/任务/笔记/邮件/搜索 ✅</strong></td>
+        <td>加股票工具</td>
+        <td><span class="badge badge-green">100%</span></td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">L2</span></td>
+        <td>模型路由</td>
+        <td>✅</td>
+        <td>加语义分类器</td>
+        <td>100%</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">L1</span></td>
+        <td>存储</td>
+        <td>DB+Redis(✅) Chroma(⚠️)</td>
+        <td>加 Chroma 长期记忆</td>
+        <td>85%</td>
+      </tr>
+      <tr style="background:var(--bg-elevated);font-weight:600">
+        <td>总</td><td>—</td><td>—</td><td>—</td>
+        <td><span class="badge badge-green">68%</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 3: 工作流入口 -->
+<!-- ============================ -->
+<div id="tab-3" class="tab-content">
+  <h2>三、工作流入口 · 说一句话触发</h2>
+
+  <div class="workflow">
+    <div class="workflow-title">🌅 1. 早晨启动工作流</div>
+    <div class="workflow-triggers">
+      <span class="trigger">早上好</span>
+      <span class="trigger">今日计划</span>
+      <span class="trigger">今日做什么</span>
+    </div>
+    <ol class="workflow-steps">
+      <li>读 <code>00-meta/daily-energy.md</code>(如无则先评估)</li>
+      <li>读昨日复盘 + 待办事项</li>
+      <li>按能量值匹配任务(参考触发词速查)</li>
+      <li>输出 3 个今日任务推荐 + 预计耗时</li>
+    </ol>
+  </div>
+
+  <div class="workflow">
+    <div class="workflow-title">🎯 2. 任务执行工作流</div>
+    <div class="workflow-triggers">
+      <span class="trigger">继续 X</span>
+      <span class="trigger">开始 X</span>
+      <span class="trigger">做 X</span>
+      <span class="trigger">打开 X</span>
+    </div>
+    <ol class="workflow-steps">
+      <li>触发 <code>smart-project-detection.mdc</code> 自动识别项目</li>
+      <li>读项目 README + 当前进度 + 待办</li>
+      <li>推荐起点 + 上下文</li>
+      <li>进入执行模式</li>
+    </ol>
+    <div style="margin-top:8px;font-size:12px;color:var(--text-muted)">
+      💡 示例:用户说"继续 AI 系统" → 识别为 <code>02-CodeProjects/2026-08-08_AI个人效能系统/</code>
+    </div>
+  </div>
+
+  <div class="workflow">
+    <div class="workflow-title">😣 3. 卡住处理工作流</div>
+    <div class="workflow-triggers">
+      <span class="trigger">卡死了</span>
+      <span class="trigger">没状态</span>
+      <span class="trigger">搞不定</span>
+      <span class="trigger">怎么办</span>
+    </div>
+    <ol class="workflow-steps">
+      <li>问卡在哪里(1-2 个问题)</li>
+      <li>给出 3 个降维方案:🅰 解决 / 🅱 跳过 / 🅲 降维</li>
+      <li>选一个执行</li>
+    </ol>
+    <div style="margin-top:8px;font-size:12px;color:var(--text-muted)">
+      💡 依据:能量低时优先 🅲🅱
+    </div>
+  </div>
+
+  <div class="workflow">
+    <div class="workflow-title">📊 4. 进度汇报工作流</div>
+    <div class="workflow-triggers">
+      <span class="trigger">进度如何</span>
+      <span class="trigger">做了什么</span>
+      <span class="trigger">今天进度</span>
+      <span class="trigger">项目状态</span>
+    </div>
+    <ol class="workflow-steps">
+      <li>扫描 <code>02-CodeProjects/</code> 所有项目</li>
+      <li>读取每个项目的进度报告 + 待办事项</li>
+      <li>生成项目状态快照(卡片式)</li>
+      <li>对比昨日,标注增量</li>
+    </ol>
+  </div>
+
+  <div class="workflow">
+    <div class="workflow-title">🌙 5. 晚间复盘工作流</div>
+    <div class="workflow-triggers">
+      <span class="trigger">收工</span>
+      <span class="trigger">下班</span>
+      <span class="trigger">复盘</span>
+      <span class="trigger">今日总结</span>
+    </div>
+    <ol class="workflow-steps">
+      <li>汇总今日对话(<code>01-ChatArchive/</code>)</li>
+      <li>汇总今日代码改动(如 git)</li>
+      <li>更新进度报告 + 待办(勾选完成)</li>
+      <li>更新 <code>daily-energy.md</code> 明日建议</li>
+      <li>追加到 <code>energy-history.md</code></li>
+      <li>触发 <code>auto-kanban-sync.mdc</code> 静默同步</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 4: Rules & Skill -->
+<!-- ============================ -->
+<div id="tab-4" class="tab-content">
+  <h2>四、Cursor Rules 清单</h2>
+
+  <table>
+    <thead>
+      <tr><th>Rule 文件</th><th>触发场景</th><th>核心规则</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>daily-energy-check.mdc</code></td>
+        <td>每日首次对话</td>
+        <td><strong>必须</strong>先评估能量值(1-10),匹配任务</td>
+      </tr>
+      <tr>
+        <td><code>auto-kanban-sync.mdc</code></td>
+        <td>Skill/项目/架构/对话变更</td>
+        <td><strong>静默自动</strong>同步 5 类看板</td>
+      </tr>
+      <tr>
+        <td><code>auto-execute-mode.mdc</code></td>
+        <td>所有对话</td>
+        <td><strong>默认全自动</strong>(仅白名单打断)</td>
+      </tr>
+      <tr>
+        <td><code>smart-project-detection.mdc</code></td>
+        <td>简称/口语提到项目</td>
+        <td><strong>智能识别</strong>项目路径,节省 token</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>规则触发优先级</h3>
+  <div class="arch-diagram">付费/凭据/破坏性操作(🚦 必须确认)
+   ↑
+auto-execute-mode(默认全自动)
+   ↑
+auto-kanban-sync(静默同步)
+   ↑
+smart-project-detection(智能匹配)
+   ↑
+daily-energy-check(每日必问)</div>
+
+  <h2>🛠️ Skill 库(17 个)</h2>
+  <p style="color:var(--text-muted);font-size:12px;margin-bottom:8px">完整注册表见 <a href="file:///d:/00-AI-project/00-meta/skill-registry.md" style="color:var(--accent)">skill-registry.md</a></p>
+
+  <h4>🔥 项目专用(4 个 · AI 系统相关)</h4>
+  <table>
+    <tr><th>Skill</th><th>触发词</th><th>用途</th></tr>
+    <tr><td><code>fastapi-crud-generator</code></td><td>"生成 CRUD"</td><td>FastAPI 增删改查 4 件套</td></tr>
+    <tr><td><code>langgraph-agent-builder</code></td><td>"构建 Agent"</td><td>LangGraph 状态机(ReAct)</td></tr>
+    <tr><td><code>fastapi-test-generator</code></td><td>"写 pytest"</td><td>httpx 测试 + 93% 覆盖</td></tr>
+    <tr><td><code>project-navigator-html</code></td><td>"生成项目导航"</td><td>单文件 HTML 工作区看板</td></tr>
+  </table>
+
+  <h4>🚀 部署/发布(1 个)</h4>
+  <table>
+    <tr><td><code>gh-pages-auto-deploy</code></td><td>"部署看板" / "同步 GitHub Pages"</td><td>一键推送看板到 my-ai-board</td></tr>
+  </table>
+
+  <h4>📚 通用方法论(8 个)</h4>
+  <p style="font-size:12px;color:var(--text-muted)"><code>systematic-debugging</code> · <code>writing-commit-messages</code> · <code>verifying-markdown-formatting</code> · <code>architecture-decision-records</code> · <code>fixing-broken-links</code> · <code>reviewing-code</code> · <code>prompt-engineering</code> · <code>incident-response</code> · <code>doc-coauthoring</code> · <code>pdf</code></p>
+
+  <h4>🎨 内容生成(3 个)</h4>
+  <p style="font-size:12px;color:var(--text-muted)"><code>generate-presentation</code>(HTML/PDF/PPTX) · <code>mind-map</code>(Mermaid) · <code>canvas</code>(Cursor 内置)</p>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 5: 项目 & 对话 -->
+<!-- ============================ -->
+<div id="tab-5" class="tab-content">
+  <h2>五、02-CodeProjects 代码项目</h2>
+
+  <div class="grid grid-3">
+    <div class="card" style="border-left:3px solid var(--success)">
+      <h3>⭐ AI 个人效能系统 <span class="badge badge-green">✅ M2 完成</span></h3>
+      <p style="color:var(--text-muted);font-size:12px;margin:6px 0">2026-08-08 启动 · Phase 1 实施 · M2 工具集 5/5</p>
+      <div class="progress-bar"><div class="progress-fill success" style="width:68%"></div></div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:6px">进度:21/34 模块 = <strong style="color:var(--success)">62%</strong> · 68 测试通过（M2 工具集 5/5）</p>
+      <p style="margin-top:8px"><a href="file:///d:/00-AI-project/02-CodeProjects/2026-08-08_AI个人效能系统/docs/Phase1进度报告.md" class="btn">📊 进度报告</a> <a href="file:///d:/00-AI-project/02-CodeProjects/2026-08-08_AI个人效能系统/docs/待办事项.md" class="btn">📋 待办</a></p>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--success)">
+      <h3>⭐ Excel 智能报价系统 <span class="badge badge-green">✅ 完成</span></h3>
+      <p style="color:var(--text-muted);font-size:12px;margin:6px 0">8/8 任务 + 7/7 测试 + 2123 SKU</p>
+      <div class="progress-bar"><div class="progress-fill success" style="width:100%"></div></div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:6px">进度:<strong style="color:var(--success)">100%</strong></p>
+      <p style="margin-top:8px"><a href="file:///d:/00-AI-project/01-ChatArchive/2026-08-08_Excel智能报价系统" class="btn">💬 对话归档</a></p>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--success)">
+      <h3>GMP 项目推进与学习 <span class="badge badge-green">✅ 完成</span></h3>
+      <p style="color:var(--text-muted);font-size:12px;margin:6px 0">12 页 HTML+PDF+PPTX</p>
+      <div class="progress-bar"><div class="progress-fill success" style="width:100%"></div></div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:6px">进度:<strong style="color:var(--success)">100%</strong></p>
+    </div>
+  </div>
+
+  <h2>六、01-ChatArchive 对话归档(10 个)</h2>
+  <table>
+    <thead><tr><th>日期</th><th>主题</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr><td>2026-08-07</td><td>模型能力咨询</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-07</td><td>项目目录与命名规则建立</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-07</td><td>Skill 全装推荐</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-08</td><td>AI 系统架构搭建</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-08</td><td>架构对比与文档化</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-08</td><td>⭐ Excel 智能报价系统</td><td><span class="badge badge-green">STAR</span></td></tr>
+      <tr><td>2026-08-08</td><td>GitHub Pages 自动部署</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-08</td><td>主引导看板远程分享</td><td><span class="badge badge-blue">历史</span></td></tr>
+      <tr><td>2026-08-08</td><td>小爱音箱与手机改造</td><td><span class="badge badge-purple">硬件</span></td></tr>
+      <tr><td>2026-08-08</td><td>龙虎榜卡片 v3 优化</td><td><span class="badge badge-cyan">UI</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 6: 触发词速查 -->
+<!-- ============================ -->
+<div id="tab-6" class="tab-content">
+  <h2>七、触发词速查 · 你说什么 → AI 干什么</h2>
+
+  <h3>日常高频(5 个工作流)</h3>
+  <table>
+    <tr><th>你说</th><th>AI 做什么</th><th>依据</th></tr>
+    <tr><td><code>早上好</code> / <code>今日计划</code></td><td>启动 🌅 早晨工作流</td><td>§ 三·工作流 1</td></tr>
+    <tr><td><code>继续 X</code> / <code>开始 X</code></td><td>启动 🎯 任务执行流</td><td>§ 三·工作流 2</td></tr>
+    <tr><td><code>卡死了</code> / <code>没状态</code></td><td>启动 😣 卡住处理流</td><td>§ 三·工作流 3</td></tr>
+    <tr><td><code>进度如何</code></td><td>启动 📊 汇报工作流</td><td>§ 三·工作流 4</td></tr>
+    <tr><td><code>收工</code> / <code>复盘</code></td><td>启动 🌙 晚间复盘流</td><td>§ 三·工作流 5</td></tr>
+    <tr><td><code>跳过</code></td><td>跳过能量评估</td><td>daily-energy-check 例外</td></tr>
+  </table>
+
+  <h3>项目专项(7 个 Skill)</h3>
+  <table>
+    <tr><th>你说</th><th>AI 做什么</th><th>Skill</th></tr>
+    <tr><td><code>生成 CRUD</code></td><td>FastAPI 增删改查</td><td>fastapi-crud-generator</td></tr>
+    <tr><td><code>写测试</code> / <code>pytest</code></td><td>httpx 测试套件</td><td>fastapi-test-generator</td></tr>
+    <tr><td><code>构建 Agent</code> / <code>ReAct</code></td><td>LangGraph 状态机</td><td>langgraph-agent-builder</td></tr>
+    <tr><td><code>生成项目导航</code></td><td>HTML 工作区看板</td><td>project-navigator-html</td></tr>
+    <tr><td><code>部署看板</code> / <code>同步 GitHub Pages</code></td><td>推送看板到 Pages</td><td>gh-pages-auto-deploy</td></tr>
+    <tr><td><code>做 PPT</code> / <code>markdown 转 PPT</code></td><td>HTML+PDF+PPTX</td><td>generate-presentation</td></tr>
+    <tr><td><code>做思维导图</code> / <code>mermaid</code></td><td>Mermaid 思维导图</td><td>mind-map</td></tr>
+  </table>
+
+  <h3>通用方法论(8 个 Skill)</h3>
+  <p style="font-size:12px;color:var(--text-muted)">
+    <code>系统化调试</code> · <code>代码审查</code> · <code>review 代码</code> · <code>写 ADR</code> · <code>架构决策记录</code> · <code>写提交信息</code> · <code>commit message</code> · <code>处理 PDF</code> · <code>PDF 转 Word</code> · <code>协作写文档</code> · <code>PRD</code> · <code>RFC</code> · <code>生产事故</code> · <code>服务挂了</code>
+  </p>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 7: 标签 & 未来 -->
+<!-- ============================ -->
+<div id="tab-7" class="tab-content">
+  <h2>八、标签索引(9 大主题)</h2>
+
+  <div class="tag-cloud">
+    <span class="tag">#Excel报价 ⭐</span>
+    <span class="tag">#中试车间</span>
+    <span class="tag">#AI个人效能系统</span>
+    <span class="tag">#架构对比</span>
+    <span class="tag">#文档化</span>
+    <span class="tag">#模型</span>
+    <span class="tag">#PDF</span>
+    <span class="tag">#PPT</span>
+    <span class="tag">#思维导图</span>
+    <span class="tag">#Skill</span>
+    <span class="tag">#项目结构</span>
+    <span class="tag">#Rules</span>
+    <span class="tag">#硬件改造</span>
+    <span class="tag">#视频会议</span>
+    <span class="tag">#蓝牙音频</span>
+    <span class="tag">#多渠道 📅</span>
+    <span class="tag">#股票投资 📅</span>
+  </div>
+
+  <h2>九、未来规划 📅</h2>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>📱 多渠道打通(暂不考虑钉钉)</h3>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:4px">
+        • 飞书 bot(L5 交互层子模块)<br>
+        • 微信 bot(L5 交互层子模块)<br>
+        • 钉钉 <span class="badge badge-red">暂不考虑</span>
+      </p>
+    </div>
+    <div class="card">
+      <h3>📈 股票投资分析(未来业务项目)</h3>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:4px">
+        • 每日复盘 / 基本面分析 / 交易策略<br>
+        • 投资逻辑 / Agent / Skill<br>
+        • 定位:02-CodeProjects/股票投资分析/
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 8: 目录树 -->
+<!-- ============================ -->
+<div id="tab-8" class="tab-content">
+  <h2>十、完整目录树</h2>
+  <div class="tree">
+📁 d:\00-AI-project <span class="desc">— 个人 Agent 工作区(根目录)</span>
+├─ 📁 00-meta <span class="desc">— 元数据(主索引/规则/模板)</span>
+│  ├─ 📄 主索引.md <span class="desc">— ⭐ 个人 Agent 控制台(v2.0)</span>
+│  ├─ 📄 命名规则.md <span class="desc">— 命名规范</span>
+│  ├─ 📄 skill-registry.md <span class="desc">— 17 Skill 元数据源</span>
+│  ├─ 📄 daily-energy.md <span class="desc">— 今日能量</span>
+│  ├─ 📄 energy-history.md <span class="desc">— 能量历史</span>
+│  ├─ 📄 task-bank.md <span class="desc">— 任务池</span>
+│  └─ 📁 _templates <span class="desc">— 模板</span>
+├─ 📁 01-ChatArchive <span class="desc">— 对话归档(10 个)</span>
+│  ├─ 📁 2026-08-07_模型能力咨询
+│  ├─ 📁 2026-08-07_项目目录与命名规则建立
+│  ├─ 📁 2026-08-07_Skill全装推荐
+│  ├─ 📁 2026-08-08_AI系统架构搭建
+│  ├─ 📁 2026-08-08_架构对比与文档化
+│  ├─ 📁 2026-08-08_Excel智能报价系统 <span class="desc">— ⭐ STAR</span>
+│  ├─ 📁 2026-08-08_GitHub_Pages自动部署与看板升级
+│  ├─ 📁 2026-08-08_看板远程分享方案
+│  ├─ 📁 2026-08-08_小爱音箱与手机改造
+│  └─ 📁 2026-08-08_龙虎榜卡片v3优化
+├─ 📁 02-CodeProjects <span class="desc">— 代码项目(3 个)</span>
+│  ├─ 📁 2026-08-08_AI个人效能系统 <span class="desc">— ⭐ 引擎(62% · M2 完成)</span>
+│  │  └─ 📁 docs(11 份文档)
+│  ├─ 📁 2026-08-08_Excel智能报价系统 <span class="desc">— ⭐ 已完成</span>
+│  ├─ 📁 2026-08-08_GMP项目推进与学习 <span class="desc">— 已完成</span>
+│  └─ 📁 2026-08-09_股票市场分析 <span class="desc">— 🆕 大爷法则 v0.2 · 多氟多 002407 已分析</span>
+├─ 📁 03-Documents <span class="desc">— 看板 HTML(3 个)</span>
+│  ├─ 📄 主引导看板.html <span class="desc">— ⭐ 门户首页(本文件)</span>
+│  ├─ 📄 Skill库可视化看板.html
+│  └─ 📄 AI个人效能系统-项目全景导航.html
+└─ 📁 99-Temp <span class="desc">— 临时草稿</span>
+  </div>
+</div>
+
+<!-- ============================ -->
+<!-- TAB 9: Token & 统计 -->
+<!-- ============================ -->
+<div id="tab-9" class="tab-content">
+  <h2>十一、Token 消耗统计 与 看板版本历史</h2>
+
+  <!-- ============== 板块 A: Token 历史（柱状图） ============== -->
+  <div class="card">
+    <h3>📊 Token 消耗历史（<span id="token-data-source">扫描中...</span>）</h3>
+
+    <!-- 切换控件 -->
+    <div style="display:flex;gap:12px;margin:12px 0;align-items:center;flex-wrap:wrap">
+      <span style="color:var(--text-muted);font-size:12px">单位：</span>
+      <label style="cursor:pointer;color:var(--text)"><input type="radio" name="token-unit" value="day" checked> 日</label>
+      <label style="cursor:pointer;color:var(--text)"><input type="radio" name="token-unit" value="month"> 月</label>
+      <label style="cursor:pointer;color:var(--text)"><input type="radio" name="token-unit" value="year"> 年</label>
+      <!-- 月份选择（仅月视图可见） -->
+      <span id="month-picker-wrap" style="display:none;margin-left:8px;align-items:center;gap:6px">
+        <span style="color:var(--text-muted);font-size:12px">月份：</span>
+        <select id="month-picker" style="background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:4px;font-size:12px"></select>
+      </span>
+      <!-- 年份选择（仅年视图可见） -->
+      <span id="year-picker-wrap" style="display:none;margin-left:8px;align-items:center;gap:6px">
+        <span style="color:var(--text-muted);font-size:12px">年份：</span>
+        <select id="year-picker" style="background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:4px;font-size:12px"></select>
+      </span>
+      <span style="margin-left:auto;color:var(--text-muted);font-size:12px" id="token-summary"></span>
+    </div>
+
+    <!-- 柱状图 canvas（固定高度，避免响应式撑爆） -->
+    <div style="background:var(--bg-elevated);border-radius:6px;padding:16px;margin-top:8px;width:100%;height:200px;overflow:hidden">
+      <canvas id="token-chart" style="height:170px !important;max-height:170px"></canvas>
+      <!-- 月视图 X 轴说明 -->
+      <div id="x-axis-hint" style="color:var(--text-dim);font-size:11px;text-align:center;margin-top:4px;height:14px;line-height:14px"></div>
+    </div>
+
+    <!-- 收起/展开原始表格 -->
+    <details style="margin-top:12px">
+      <summary style="cursor:pointer;color:var(--cyan);font-size:13px">📋 原始数据（点击展开）</summary>
+      <div id="token-raw-table" style="margin-top:10px"></div>
+    </details>
+  </div>
+
+  <!-- ============== 板块 B: 今日统计 ============== -->
+  <div class="card">
+    <h3>📅 今日统计（2026-08-11 · 估算结算）</h3>
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px">
+      <div class="stat"><div class="stat-label">输入</div><div class="stat-value">0</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">输出</div><div class="stat-value">0</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">系统</div><div class="stat-value">0</div><div class="stat-sub">tokens（0 轮）</div></div>
+      <div class="stat"><div class="stat-label">合计</div><div class="stat-value warning">0</div><div class="stat-sub">含系统提示</div></div>
+    </div>
+      <div class="stat"><div class="stat-label">输出</div><div class="stat-value">186,000</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">系统</div><div class="stat-value">12,000</div><div class="stat-sub">tokens（60 轮）</div></div>
+      <div class="stat"><div class="stat-label">合计</div><div class="stat-value warning">210,000</div><div class="stat-sub">⚠️ 人工估算</div></div>
+    </div>
+      <div class="stat"><div class="stat-label">输出</div><div class="stat-value">186,000</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">系统</div><div class="stat-value">12,000</div><div class="stat-sub">tokens（60 轮）</div></div>
+      <div class="stat"><div class="stat-label">合计</div><div class="stat-value warning">210,000</div><div class="stat-sub">⚠️ 人工估算</div></div>
+    </div>
+      <div class="stat"><div class="stat-label">输出</div><div class="stat-value">186,000</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">系统</div><div class="stat-value">12,000</div><div class="stat-sub">tokens（60 轮）</div></div>
+      <div class="stat"><div class="stat-label">合计</div><div class="stat-value warning">210,000</div><div class="stat-sub">⚠️ 人工估算</div></div>
+    </div>
+      <div class="stat"><div class="stat-label">输出</div><div class="stat-value">186,000</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">系统</div><div class="stat-value">12,000</div><div class="stat-sub">tokens（60 轮）</div></div>
+      <div class="stat"><div class="stat-label">合计</div><div class="stat-value warning">210,000</div><div class="stat-sub">⚠️ 人工估算</div></div>
+    </div>
+      <div class="stat"><div class="stat-label">输出</div><div class="stat-value">40,994</div><div class="stat-sub">tokens</div></div>
+      <div class="stat"><div class="stat-label">系统</div><div class="stat-value">9,600</div><div class="stat-sub">tokens（48 轮）</div></div>
+      <div class="stat"><div class="stat-label">合计</div><div class="stat-value warning">66,794</div><div class="stat-sub">含 SSH 改造增量</div></div>
+    </div>
+    <h3 style="margin-top:14px">今日工作话题</h3>
+    <ul style="padding-left:20px;color:var(--text-muted);font-size:13px;margin-top:8px">
+      <li>04 项目文件夹重命名（AI 系统 / 报价 / 龙虎榜 / 小爱音箱）</li>
+      <li>auto-kanban-sync 规则升级 v1.0 → v1.2</li>
+      <li>push_kanban_to_github_pages.py 改写（HTTP API → git push）</li>
+      <li>首次远程推送 8/8 看板成功（零 token 输入）</li>
+      <li>新增 Token 板块 + 版本历史板块 · 看板 v2.2</li>
+      <li><strong>🚀 2026-08-09 部署方案升级：5 方案试错 → 腾讯云 CloudBase 胜出</strong></li>
+      <li>新增 cloudbase-auto-deploy Skill v1.0（国内首选 + iOS 完美兼容）</li>
+      <li>归档 2026-08-09_腾讯云CloudBase部署实战 · 看板 v2.3</li>
+      <li><strong>🔒 2026-08-09 22:30 密码门上线：770880 SHA-256 保护 4 个看板</strong></li>
+      <li><strong>🌙 2026-08-09 22:30 收工结算：今日 ~426K tokens / 2 个话题 · 看板 v2.4</strong></li>
+      <li><strong>🆕 2026-08-09 22:30 Skill 库扩张：从 anthropics/skills 克隆 14 个官方 Skill（docx/xlsx/pptx/mcp-builder/skill-creator 等）+ 重命名 generate-presentation → markdown-to-html-ppt · 自定义 Skill 17 → 31 · 看板 v2.5</strong></li>
+      <li><strong>🎯 2026-08-09 21:00 创建 daye-stock-analysis Skill v0.1：基于「大爷强化学习8课」体系，3 模式（单股深度/批量扫描/持仓诊断），注册到 skill-registry.md</strong></li>
+      <li><strong>🔀 2026-08-09 21:08 daye-stock-analysis → 大爷法则（daye-faze）v0.2：名称升级，触发词全面替换为「大爷法则」</strong></li>
+      <li><strong>📊 2026-08-09 21:49 多氟多 002407 大爷法则分析归档：5 大买点扫描命中 2 个（主升浪 + 修复结构），综合评分 ⭐⭐⭐⭐，不推荐追高，等回调到 MA5（37.43）</strong></li>
+      <li><strong>🛠️ 2026-08-10 16:47 收工修复（v2.8）：补齐昨天漏更新的 4 项内容（daye-faze/股票项目/M2 完成/Token 话题）+ 补建 verify_kanban_content.py 校验体系</strong></li>
+      <li><strong>🛠️ 2026-08-10 16:45 收工修复（v2.8）：补齐昨天漏更新的 4 项内容（daye-faze/股票项目/M2 完成/Token 话题）+ 补建 verify_kanban_content.py 校验体系</strong></li>
+      <li><strong>🛠️ 2026-08-10 10:28 收工修复（v2.8）：补齐昨天漏更新的 4 项内容（daye-faze/股票项目/M2 完成/Token 话题）+ 补建 verify_kanban_content.py 校验体系</strong></li>
+      <li><strong>🛠️ 2026-08-10 16:18 收工修复 v2.9：删除主引导话题 5 个重复 li（762-781 区域）+ 重新跑推送链 + 重新 verify_kanban_content.py</strong></li>
+    </ul>
+  </div>
+
+  <!-- ============== 板块 C: 看板版本历史 ============== -->
+  <div class="card">
+    <h3>📜 主引导看板版本历史</h3>
+    <div style="margin-top:10px;padding-left:8px;border-left:2px solid var(--border)">
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.7 · 2026-08-09 22:30 <span style="color:var(--green);font-size:11px;margin-left:6px">● LATEST</span></div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">修复图表容器被撑爆（强制固定高度 200px）</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          之前图表父容器 height: auto + Chart.js responsive: true 导致切到月视图时 canvas 撑到几千像素。修复：父容器固定 height:200px overflow:hidden，canvas 强制 style.height=170px !important max-height:170px。Tab 切换时 destroy + 重新 render 强制锁尺寸。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">
+          触发词："切到月视图整个对话框无限大" · 生成器：CSS max-height + canvas !important · Token 增量 +2,200
+        </div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.6 · 2026-08-09 22:30 <span style="color:var(--green);font-size:11px;margin-left:6px">● LATEST</span></div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">Y 轴自适应量级 + 25% 顶部余量</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          Token 图表 Y 轴新增 niceStep/formatTick 自适应函数：<1k 显示 token，<10万 显示 k，<100万 显示 万，≥100万 显示 M。suggestedMax = max(values) × 1.25，最高柱永远只占图表高度的 80%（留 25% 顶部空隙），无论数据从 70k 涨到 100k 还是 100M 都不会顶天。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">
+          触发词："柱太高了" · 生成器：前端 niceStep + formatTick · Token 增量 +3,500
+        </div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.5 · 2026-08-09 22:30 <span style="color:var(--green);font-size:11px;margin-left:6px">● LATEST</span></div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">Token 图表月/年视图 X 轴展开（1-31/1-12）</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          主引导看板的 Token 图表月视图现在强制 X 轴展开为 1-31 日，无数据天灰色占位；年视图 X 轴展开为 1-12 月。新增月份/年份下拉选择器。数据结构从聚合 stats 改为按 days[] 实时计算，下拉切换瞬时响应。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">
+          触发词："月视图只有 1 根柱子不直观" · 生成器：前端 Chart.js + renderTokenChart 重写 · Token 增量 +4,200
+        </div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.4 · 2026-08-09 22:30 <span style="color:var(--green);font-size:11px;margin-left:6px">● LATEST</span></div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">SSH 推送零弹窗改造</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          push_kanban_to_github_pages.py 从 HTTPS+gh CLI 切换到 SSH 直连。新增自动 SSH key 检测/生成/连通测试函数 <code>check_ssh_setup()</code>。公钥已生成（ed25519）等待用户一次性添加到 GitHub Settings → SSH keys。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">
+          🔑 公钥指纹 SHA256:l+WGg8jG+fVZCSHu3gJjXje7kNfYf2xLaZL4dJJZ4wk
+          · 触发词："Git 对话框"反馈 · Token 增量 +8,720
+        </div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.3 · 2026-08-09 22:30 <span style="color:var(--green);font-size:11px;margin-left:6px">● LATEST</span></div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">收工结算联动 · Token 49.5k → 58k</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          estimate_tokens.py 升级 fallback 机制（无数据源自动用上次 history）。今日 Token 增量 8.5k（从 49.5k → 58.1k），end-of-day-token-settlement.mdc v1.0 + auto-kanban-sync.mdc v1.3 联动验证通过。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">触发词："结束今天的工作" · 生成器：estimate_tokens.py settle</div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.2 · 2026-08-09 22:30</div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">Token 历史 + 版本日志板块</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          <!-- 1) Token 每日消耗柱状图（日/月/年切换）2) 看板版本更新历史时间线 3) 收工结算流程（说'结束今天的工作'即触发） -->
+          新增：① Token 每日消耗柱状图（日/月/年切换） · ② 看板版本更新历史时间线 · ③ 收工结算流程（说"结束今天的工作"即触发）
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">由 estimate_tokens.py + 手动看板生成</div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.3 · 2026-08-09 22:30</div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">部署方案升级 → CloudBase + 新归档入口</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          ① 5 方案试错（Surge / Netlify / Cloudflare / Surge 重试 / CloudBase）→ 最终采用腾讯云 CloudBase<br>
+          ② 新增 cloudbase-auto-deploy Skill v1.0（国内首选 + iOS 完美兼容）<br>
+          ③ 新增归档 2026-08-09_腾讯云CloudBase部署实战（对话摘要 + 笔记）<br>
+          ④ gh-pages-auto-deploy 标记"⚠️ iOS 偶现 TLS 失败（已迁移到 CloudBase）"
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">由 tcb CLI + skill-registry.md + auto-kanban-sync 规则</div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--success)"></div>
+        <div style="color:var(--accent);font-weight:600">v2.4 · 2026-08-09 22:30 ⭐ 收工版</div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">🔒 密码门 770880 + 🌙 收工结算</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          ① 4 个看板全部加 SHA-256 密码门（770880 → 已测试 7 用例全通过）<br>
+          ② 删除过时文件 .env / data_url.txt / 朋友访问指南.md<br>
+          ③ 今日 token 结算 ~426K（输入 9K + 输出 417K）<br>
+          ④ token-history.json 写入今日记录<br>
+          ⑤ 归档新增：今日对话概要 + 收工清单
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">由 crypto.subtle.digest + estimate_tokens.py fallback + auto-kanban-sync</div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--text-muted)"></div>
+        <div style="color:var(--text-muted);font-weight:600">v2.1 · 2026-08-09 22:30</div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">M2 里程碑标注</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          AI 个人效能系统 M2 工具集 5/5 完成（Schedule/Task/Note/Email/Search），68 测试全通过（M2 部分）。看板同步反射 Task 5 状态。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">里程碑：M2-工具集完成 · 生成器：project-navigator-html</div>
+      </div>
+      <div style="margin-bottom:14px;padding-left:12px;position:relative">
+        <div style="position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--text-dim)"></div>
+        <div style="color:var(--text-dim);font-weight:600">v2.0 · 2026-08-08 16:00</div>
+        <div style="color:var(--text);font-size:13px;margin-top:3px">首版主引导看板</div>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:4px">
+          9 个标签页：定位 / 架构 / 工作流 / Rules / 项目 / 触发词 / 标签 / 目录树 / Token。覆盖整个 d:\00-AI-project 工作区。
+        </div>
+        <div style="color:var(--text-dim);font-size:11px;margin-top:3px">生成器：project-navigator-html · 文件大小：58,700 bytes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center;color:var(--text-dim);font-size:11px;margin-top:32px">
+  🤖 Generated by project-navigator-html + estimate_tokens.py · v2.9 · 2026-08-10 16:18
+  <br>
+  看板 v2.9 · 删 5 个重复话题 li + 推送链内容真实性修复 · 工作区路径: d:\00-AI-project
+</p>
+
+</div>
+
+<!-- Chart.js（CDN，缓存到浏览器） -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+// ============ Token 图表数据 ============
+const TOKEN_DATA = {
+  source: "00-meta/token-history.json",
+  last_synced: "2026-08-11 13:53",
+  days: [
+    { date: "2026-08-09", total: 426579, input: 9055, output: 417524, system: 12000 },
+    { date: "2026-08-10", total: 210000, input: 12000, output: 186000, system: 12000 },
+    { date: "2026-08-11", total: 0, input: 0, output: 0, system: 0 }
+  ],
+  monthly: [
+    { month: "2026-08", total: 636579, days: 3, avg: 212193 }
+  ],
+  yearly: [
+    { year: "2026", total: 636579, days: 3, avg: 212193 }
+  ]
+};
+
+let tokenChart = null;
+
+function fmt(n) {
+  return n.toLocaleString('en-US');
+}
+
+// ===== Y 轴自适应量级 =====
+// 根据数据最大值决定 Y 轴上限和显示单位
+// 规则：最大柱占图表高度的 ~80%（即 1.25 倍）
+function niceStep(m) {
+  // 把 max 向上取整到下一个"舒服"的刻度（1/2/5 系列）
+  if (m <= 10)   return 2;
+  if (m <= 50)   return 10;
+  if (m <= 100)  return 20;
+  if (m <= 500)  return 100;
+  if (m <= 1000) return 200;
+  if (m <= 5000) return 1000;
+  if (m <= 10000)  return 2000;
+  if (m <= 50000)  return 10000;       // 5万
+  if (m <= 100000) return 20000;       // 10万
+  if (m <= 500000) return 100000;      // 50万
+  if (m <= 1000000) return 200000;     // 100万
+  if (m <= 5000000) return 1000000;
+  return Math.pow(10, Math.floor(Math.log10(m)));
+}
+
+function formatTick(v, values) {
+  if (v === 0) return '0';
+  const max = values.length ? Math.max(...values) : 0;
+  if (max < 1000) return v;                     // <1k：直接显示
+  if (max < 10000) return (v/1000).toFixed(v < 10000 ? 1 : 0) + 'k';
+  if (max < 100000) return Math.round(v/1000) + 'k';   // <10万：用 k
+  if (max < 1000000) return (v/10000).toFixed(1) + '万'; // <100万：用万
+  return (v/1000000).toFixed(1) + 'M';                  // ≥100万：用 M
+}
+
+function renderTokenChart(unit) {
+  const selectedMonth = document.getElementById('month-picker').value;
+  const selectedYear = document.getElementById('year-picker').value;
+
+  // 控制 picker 显隐
+  document.getElementById('month-picker-wrap').style.display = (unit === 'month') ? 'inline-flex' : 'none';
+  document.getElementById('year-picker-wrap').style.display = (unit === 'year') ? 'inline-flex' : 'none';
+
+  let labels = [], values = [], raw = [], colors = [];
+  let xHint = '';
+
+  if (unit === 'day') {
+    // 日视图：最近 30 天（按 days[] 数据全集）
+    TOKEN_DATA.days.forEach(d => {
+      labels.push(d.date.slice(5));
+      values.push(d.total);
+      raw.push(`<tr><td>${d.date}</td><td>${fmt(d.input)}</td><td>${fmt(d.output)}</td><td>${fmt(d.system)}</td><td><strong>${fmt(d.total)}</strong></td></tr>`);
+    });
+    xHint = `X 轴 = 日期（共 ${values.length} 天）`;
+
+  } else if (unit === 'month') {
+    // 月视图：X 轴强制 1-31 日，无数据天灰色占位
+    const monthData = TOKEN_DATA.days.filter(d => d.date.startsWith(selectedMonth));
+    const [year, month] = selectedMonth.split('-').map(Number);
+    const daysInMonth = new Date(year, month, 0).getDate(); // 月末日期
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${selectedMonth}-${String(day).padStart(2,'0')}`;
+      const found = monthData.find(d => d.date === dateStr);
+      labels.push(String(day));
+      if (found) {
+        values.push(found.total);
+        raw.push(`<tr><td>${dateStr}</td><td>${fmt(found.input)}</td><td>${fmt(found.output)}</td><td>${fmt(found.system)}</td><td><strong>${fmt(found.total)}</strong></td></tr>`);
+      } else {
+        values.push(0);
+        raw.push(`<tr style="color:var(--text-dim)"><td>${dateStr}</td><td>-</td><td>-</td><td>-</td><td>无数据</td></tr>`);
+      }
+    }
+    // 把柱子颜色：有数据 = 蓝渐变，无数据 = 灰色
+    colors = values.map(v => v > 0 ? null : 'rgba(139,148,158,0.25)');
+    xHint = `X 轴 = ${selectedMonth} 月的 1-${daysInMonth} 日（${monthData.length} 天有数据）`;
+
+  } else {
+    // 年视图：X 轴 1-12 月，按月聚合；选中的年过滤
+    const yearData = TOKEN_DATA.days.filter(d => d.date.startsWith(selectedYear));
+    const monthlyMap = {};
+    yearData.forEach(d => {
+      const m = d.date.slice(5, 7); // "MM"
+      monthlyMap[m] = (monthlyMap[m] || 0) + d.total;
+    });
+    for (let m = 1; m <= 12; m++) {
+      const mKey = String(m).padStart(2, '0');
+      labels.push(`${mKey}月`);
+      const total = monthlyMap[mKey] || 0;
+      values.push(total);
+      const monthEntries = yearData.filter(d => d.date.slice(5,7) === mKey);
+      if (total > 0) {
+        const input = monthEntries.reduce((a,b)=>a+b.input,0);
+        const output = monthEntries.reduce((a,b)=>a+b.output,0);
+        const system = monthEntries.reduce((a,b)=>a+b.system,0);
+        raw.push(`<tr><td>${selectedYear}-${mKey}</td><td>${fmt(input)}</td><td>${fmt(output)}</td><td>${fmt(system)}</td><td><strong>${fmt(total)}</strong></td></tr>`);
+      } else {
+        raw.push(`<tr style="color:var(--text-dim)"><td>${selectedYear}-${mKey}</td><td>-</td><td>-</td><td>-</td><td>无数据</td></tr>`);
+      }
+    }
+    colors = values.map(v => v > 0 ? null : 'rgba(139,148,158,0.25)');
+    xHint = `X 轴 = ${selectedYear} 年的 1-12 月（${yearData.length} 天有数据）`;
+  }
+
+  // 汇总
+  const total = values.reduce((a,b) => a+b, 0);
+  const nonZero = values.filter(v => v > 0);
+  const avg = nonZero.length ? Math.round(total/nonZero.length) : 0;
+  const max = values.length ? Math.max(...values) : 0;
+  document.getElementById('token-summary').textContent =
+    `合计 ${fmt(total)} · 有效日均 ${fmt(avg)} · 峰值 ${fmt(max)}`;
+  document.getElementById('x-axis-hint').textContent = xHint;
+
+  // 原始表格
+  const header = '<tr><th>日期</th><th>输入</th><th>输出</th><th>系统</th><th>合计</th></tr>';
+  document.getElementById('token-raw-table').innerHTML =
+    `<table style="width:100%;font-size:12px">${header}${raw.join('')}</table>`;
+
+  // 柱状图
+  const ctx = document.getElementById('token-chart').getContext('2d');
+  if (tokenChart) tokenChart.destroy();
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, 'rgba(88, 166, 255, 0.9)');
+  gradient.addColorStop(1, 'rgba(88, 166, 255, 0.2)');
+
+  const barColors = colors.map(c => c || gradient);
+
+  tokenChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Token 消耗',
+        data: values,
+        backgroundColor: barColors,
+        borderColor: 'rgba(88, 166, 255, 1)',
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      // 锁定图表本体高度（不响应式扩散）
+      // 父容器已固定 200px，canvas 170px + X 轴 14px + 内边距
+      animation: { duration: 300 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.parsed.y.toLocaleString('en-US')} tokens`
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          // Y 轴上限 = 最高柱 × 1.25（留 25% 顶部余量，最高柱不会顶天）
+          // 量级自适应：<10k 用 'token'，10k-1M 用 'k'/'万'，≥1M 用 'M'
+          suggestedMax: (() => {
+            const m = values.length ? Math.max(...values) : 0;
+            return m > 0 ? Math.ceil(m * 1.25 / niceStep(m)) * niceStep(m) : 100;
+          })(),
+          ticks: {
+            color: '#8b949e',
+            callback: function(v) { return formatTick(v, values); }
+          },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        x: {
+          ticks: { color: '#8b949e' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// 初始化 month-picker / year-picker（从 TOKEN_DATA.days 提取有数据的月份/年份）
+function initPickers() {
+  const months = new Set();
+  const years = new Set();
+  TOKEN_DATA.days.forEach(d => {
+    months.add(d.date.slice(0, 7)); // YYYY-MM
+    years.add(d.date.slice(0, 4));   // YYYY
+  });
+  const todayMonth = new Date().toISOString().slice(0, 7);
+  const todayYear = new Date().toISOString().slice(0, 4);
+  // 没数据时也至少加上当前月/年
+  months.add(todayMonth);
+  years.add(todayYear);
+
+  const mp = document.getElementById('month-picker');
+  Array.from(months).sort().reverse().forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = m;
+    if (m === todayMonth) opt.selected = true;
+    mp.appendChild(opt);
+  });
+  const yp = document.getElementById('year-picker');
+  Array.from(years).sort().reverse().forEach(y => {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if (y === todayYear) opt.selected = true;
+    yp.appendChild(opt);
+  });
+
+  mp.addEventListener('change', () => {
+    const unit = document.querySelector('input[name="token-unit"]:checked').value;
+    renderTokenChart(unit);
+  });
+  yp.addEventListener('change', () => {
+    const unit = document.querySelector('input[name="token-unit"]:checked').value;
+    renderTokenChart(unit);
+  });
+}
+
+document.getElementById('token-data-source').textContent = TOKEN_DATA.source;
+initPickers();
+renderTokenChart('day');
+
+// 切换单位
+document.querySelectorAll('input[name="token-unit"]').forEach(r => {
+  r.addEventListener('change', (e) => renderTokenChart(e.target.value));
+});
+
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab')[
+    Array.from(document.querySelectorAll('.tab')).findIndex(el =>
+      el.getAttribute('onclick')?.includes(id)
+    )
+  ].classList.add('active');
+  // 进入 Token 板块时重绘图表（强制锁定尺寸，防止被父容器撑爆）
+  if (id === 'tab-9') {
+    const canvas = document.getElementById('token-chart');
+    if (canvas) {
+      // 强制设置 canvas 像素高度（避免响应式扩散）
+      canvas.style.height = '170px';
+      canvas.style.maxHeight = '170px';
+      canvas.style.width = '100%';
+      // 销毁重绘
+      if (tokenChart) { tokenChart.destroy(); tokenChart = null; }
+      const unit = document.querySelector('input[name="token-unit"]:checked').value;
+      renderTokenChart(unit);
+    }
+  }
+}
+
+function filterCards(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('.card, table, .workflow, .tag, h3, .stat').forEach(el => {
+    el.style.background = '';
+  });
+  if (!q) return;
+  // 简单高亮
+  document.querySelectorAll('.card').forEach(el => {
+    const text = el.textContent.toLowerCase();
+    if (text.includes(q)) {
+      el.style.borderColor = 'var(--accent)';
+      el.style.boxShadow = '0 0 0 1px var(--accent)';
+    } else {
+      el.style.opacity = '0.3';
+    }
+  });
+}
+</script>
+
+<script>
+// 密码 "770880" 的 SHA-256 哈希（前端比对，不存明文）
+const PW_HASH = '84eee289aaed0156541b079cd0cff292211a21339796f47c58e17f2c93d3b07a';
+
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+const pwInput = document.getElementById('pw');
+const pwBtn = document.getElementById('pwBtn');
+const pwMsg = document.getElementById('pwMsg');
+const gate = document.getElementById('gate');
+
+// 已通过认证则直接跳过（同一会话）
+if(sessionStorage.getItem('aiboard_auth')==='1'){
+  gate.style.display='none';
+}
+
+async function checkPw(){
+  const v = pwInput.value.trim();
+  if(v.length!==6){
+    pwMsg.textContent='请输入 6 位密码';
+    pwInput.classList.add('error');
+    setTimeout(()=>pwInput.classList.remove('error'),400);
+    return;
+  }
+  const h = await sha256(v);
+  if(h === PW_HASH){
+    sessionStorage.setItem('aiboard_auth','1');
+    gate.style.display='none';
+    pwInput.value='';
+    pwMsg.textContent='';
+  } else {
+    pwMsg.textContent='密码错误';
+    pwInput.classList.add('error');
+    setTimeout(()=>pwInput.classList.remove('error'),400);
+    pwInput.value='';
+    pwInput.focus();
+  }
+}
+
+if(pwBtn){ pwBtn.addEventListener('click', checkPw); }
+if(pwInput){ pwInput.addEventListener('keypress', e=>{ if(e.key==='Enter') checkPw(); }); pwInput.focus(); }
+</script>
+</body>
+</html>

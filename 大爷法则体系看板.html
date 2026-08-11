@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大爷法则体系看板 · Daye-Faze</title>
+<style>
+  :root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #131826;
+    --bg-card: #1a2238;
+    --border-color: #2d3a55;
+    --text-primary: #e8eaf0;
+    --text-secondary: #9ba3b8;
+    --accent-red: #e74c3c;
+    --accent-green: #2ecc71;
+    --accent-blue: #3498db;
+    --accent-yellow: #f1c40f;
+    --accent-purple: #9b59b6;
+    --accent-orange: #e67e22;
+    --accent-cyan: #1abc9c;
+    --shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a2238 0%, #2d3a55 100%);
+    padding: 32px 24px;
+    text-align: center;
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(231,76,60,0.08) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #e74c3c 0%, #f1c40f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .header .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    position: relative;
+  }
+
+  .header .version-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 4px 12px;
+    background: rgba(231,76,60,0.15);
+    border: 1px solid var(--accent-red);
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--accent-red);
+    position: relative;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* 顶部统计卡片 */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-blue);
+  }
+
+  .stat-card.danger::before { background: var(--accent-red); }
+  .stat-card.success::before { background: var(--accent-green); }
+  .stat-card.warning::before { background: var(--accent-yellow); }
+  .stat-card.info::before { background: var(--accent-cyan); }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  .stat-card .number {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent-blue);
+    margin-bottom: 4px;
+  }
+
+  .stat-card.danger .number { color: var(--accent-red); }
+  .stat-card.success .number { color: var(--accent-green); }
+  .stat-card.warning .number { color: var(--accent-yellow); }
+  .stat-card.info .number { color: var(--accent-cyan); }
+
+  .stat-card .label {
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  /* Tab 切换 */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--bg-secondary);
+    padding: 6px;
+    border-radius: 12px;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+  }
+
+  .tab-btn {
+    flex: 1;
+    min-width: max-content;
+    padding: 10px 20px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  .tab-btn.active {
+    background: var(--accent-red);
+    color: white;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.3);
+  }
+
+  /* 内容区 */
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 章节卡片 */
+  .section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent-yellow);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title .icon {
+    font-size: 24px;
+  }
+
+  /* 知识地图 */
+  .knowledge-map {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    overflow-x: auto;
+    border-left: 4px solid var(--accent-blue);
+  }
+
+  /* 买点卡片 */
+  .buy-point-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .buy-point-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-blue);
+    border-radius: 8px;
+    padding: 16px;
+    transition: transform 0.2s;
+  }
+
+  .buy-point-card:hover {
+    transform: translateX(4px);
+  }
+
+  .buy-point-card.level-5 { border-left-color: #ff6b6b; }
+  .buy-point-card.level-4 { border-left-color: #ffa94d; }
+  .buy-point-card.level-3 { border-left-color: #ffd43b; }
+
+  .buy-point-card h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .buy-point-card .priority {
+    font-size: 12px;
+    color: var(--accent-yellow);
+  }
+
+  .buy-point-card p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* 表格 */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+  }
+
+  .data-table th {
+    background: var(--bg-card);
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .data-table tr:hover {
+    background: var(--bg-card);
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .tag-red { background: rgba(231,76,60,0.2); color: var(--accent-red); }
+  .tag-green { background: rgba(46,204,113,0.2); color: var(--accent-green); }
+  .tag-blue { background: rgba(52,152,219,0.2); color: var(--accent-blue); }
+  .tag-yellow { background: rgba(241,196,15,0.2); color: var(--accent-yellow); }
+  .tag-orange { background: rgba(230,126,34,0.2); color: var(--accent-orange); }
+
+  /* 铁律卡片 */
+  .iron-rule {
+    background: linear-gradient(135deg, rgba(231,76,60,0.1) 0%, rgba(231,76,60,0.05) 100%);
+    border: 1px solid var(--accent-red);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .iron-rule .rule-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-red);
+    margin-bottom: 6px;
+  }
+
+  .iron-rule .rule-content {
+    color: var(--text-primary);
+    font-size: 13px;
+  }
+
+  /* 五浪结构图 */
+  .wave-diagram {
+    display: flex;
+    align-items: end;
+    justify-content: space-around;
+    height: 200px;
+    margin: 20px 0;
+    padding: 0 20px;
+  }
+
+  .wave {
+    flex: 1;
+    margin: 0 4px;
+    background: linear-gradient(180deg, var(--accent-blue) 0%, transparent 100%);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: transform 0.3s;
+  }
+
+  .wave:hover { transform: scaleY(1.05); }
+
+  .wave.wave-1 { height: 30%; background: linear-gradient(180deg, #95a5a6 0%, transparent 100%); }
+  .wave.wave-2 { height: 20%; background: linear-gradient(180deg, #95a5a6 0%, transparent 100%); }
+  .wave.wave-3 { height: 100%; background: linear-gradient(180deg, #e74c3c 0%, transparent 100%); }
+  .wave.wave-4 { height: 70%; background: linear-gradient(180deg, #f39c12 0%, transparent 100%); }
+  .wave.wave-5 { height: 90%; background: linear-gradient(180deg, #95a5a6 0%, transparent 100%); }
+
+  .wave-label {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  /* 主升5要素网格 */
+  .factor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .factor {
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-green);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .factor:hover {
+    background: var(--bg-card);
+    transform: scale(1.02);
+  }
+
+  .factor .check {
+    color: var(--accent-green);
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .factor .name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* 流程图 */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .flow-step {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-blue);
+    padding: 12px 16px;
+    border-radius: 6px;
+    position: relative;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '↓';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent-blue);
+    font-size: 16px;
+  }
+
+  .flow-step.success { border-left-color: var(--accent-green); }
+  .flow-step.warning { border-left-color: var(--accent-yellow); }
+  .flow-step.danger { border-left-color: var(--accent-red); }
+
+  /* 决策树 */
+  .decision-tree {
+    background: var(--bg-secondary);
+    padding: 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 40px;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .header h1 { font-size: 24px; }
+    .container { padding: 16px; }
+    .section { padding: 16px; }
+    .buy-point-grid { grid-template-columns: 1fr; }
+  }
+
+  /* 强调文字 */
+  .highlight {
+    color: var(--accent-yellow);
+    font-weight: 700;
+  }
+
+  .danger-text {
+    color: var(--accent-red);
+    font-weight: 700;
+  }
+
+  .success-text {
+    color: var(--accent-green);
+    font-weight: 700;
+  }
+
+  /* Mermaid 样式 */
+  .mermaid {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    color: var(--text-primary);
+    overflow-x: auto;
+  }
+
+  .mermaid svg {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+  }
+
+  .mermaid-error {
+    background: rgba(231,76,60,0.1);
+    border: 1px solid var(--accent-red);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    color: var(--accent-red);
+  }
+
+  code {
+    background: rgba(52,152,219,0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-blue);
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+  }
+
+  a {
+    color: var(--accent-yellow);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent-yellow);
+  }
+
+  a:hover {
+    color: var(--accent-orange);
+    border-bottom-color: var(--accent-orange);
+  }
+
+/* ========== 密码门 ========== */
+.gate{position:fixed;inset:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:99999}
+.gate-box{background:#161b22;border-radius:20px;padding:40px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;border:1px solid #30363d}
+.gate-box h2{margin:0 0 8px;font-size:20px;color:#e6edf3}
+.gate-box .hint{color:#8b949e;font-size:12px;margin:0 0 20px}
+.pw-input{width:100%;padding:14px;font-size:18px;border:2px solid #30363d;border-radius:10px;text-align:center;letter-spacing:8px;font-weight:bold;outline:none;transition:border .2s;background:#0d1117;color:#e6edf3}
+.pw-input:focus{border-color:#58a6ff}
+.pw-input.error{border-color:#da3633;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pw-btn{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.pw-btn:active{opacity:.85}
+.pw-msg{color:#da3633;font-size:12px;margin-top:10px;min-height:16px}
+.lock-icon{font-size:36px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<!-- ========== 密码门 ========== -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <div class="lock-icon">🔒</div>
+    <h2>d: -AI-project 看板</h2>
+    <p class="hint">请输入 6 位访问密码</p>
+    <input id="pw" class="pw-input" type="password" inputmode="numeric" maxlength="6" placeholder="******" autocomplete="off">
+    <button id="pwBtn" class="pw-btn">进入</button>
+    <div id="pwMsg" class="pw-msg"></div>
+  </div>
+</div>
+
+
+<div class="header">
+  <h1>🎯 大爷法则体系看板</h1>
+  <div class="subtitle">Daye-Faze Trading System · 大爷强化学习8课（理论） + 33节主力行为（实战）</div>
+  <span class="version-badge">v0.14 · 2026-08-10 22:20（修复第 3 个 Mermaid 块缺失外层 div）</span>
+</div>
+
+<div class="container">
+
+  <!-- 顶部统计 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="number">24</div>
+      <div class="label">整合讲次</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="number">6</div>
+      <div class="label">买点类型</div>
+    </div>
+    <div class="stat-card success">
+      <div class="number">5</div>
+      <div class="label">主力行为阶段</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="number">40%</div>
+      <div class="label">单股仓位上限</div>
+    </div>
+    <div class="stat-card info">
+      <div class="number">30-40</div>
+      <div class="label">主升止盈目标（%）</div>
+    </div>
+  </div>
+
+  <!-- Tab 切换 -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="overview">📖 体系总览</button>
+    <button class="tab-btn" data-tab="structure">🏗️ 强势结构</button>
+    <button class="tab-btn" data-tab="buypoints">💎 6类买点</button>
+    <button class="tab-btn" data-tab="mainwave">🚀 主升浪</button>
+    <button class="tab-btn" data-tab="sell">⚖️ 卖出体系</button>
+<button class="tab-btn" data-tab="risk">🚨 风控铁律</button>
+  <button class="tab-btn" data-tab="expand">📚 33节主力行为（实战）</button>
+  <button class="tab-btn" data-tab="mindmap">🧠 思维导图</button>
+</div>
+
+  <!-- ============== Tab 1: 体系总览 ============== -->
+  <div class="tab-content active" id="overview">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🧠</span>顶层心智模型</div>
+      <div style="background: linear-gradient(135deg, rgba(241,196,15,0.1) 0%, rgba(241,196,15,0.05) 100%); border: 1px solid var(--accent-yellow); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 24px; font-weight: 800; color: var(--accent-yellow); margin-bottom: 8px;">
+          "盘口是仆人，结构是主人"
+        </div>
+        <div style="color: var(--text-secondary); font-size: 13px;">
+          先看结构（位置+趋势+量能）→ 再验证买点（K线形态）→ 最后看盘口（主力行为）<br>
+          站在<span class="highlight">主力视角</span>思考市场，目标吃 <span class="highlight">30-40 个点主升浪</span>
+        </div>
+      </div>
+
+<div class="mermaid">
+flowchart TB
+    TITLE["<b>🎯 大爷法则 · 课程整体逻辑（理论 + 实战双层架构）</b>"]
+
+    %% === 顶层心智 ===
+    MIND["<b>盘口是仆人，结构是主人</b><br/>主力视角，吃 30-40 个点"]
+    TITLE --> MIND
+
+    %% === 理论层 · 8 课（PDF 强化学习一~八）===
+    THEORY["<b>理论层 · 8 课</b><br/>（8 个 PDF：强化学习一~八）"]
+    MIND --> THEORY
+
+    T1["第 1 课<br/>强势结构识别"]
+    T2["第 2-3 课<br/>5 类买点<br/>大长腿·阳包阴·上影线·出坑·修复"]
+    T3["第 4 课<br/>主升浪买点"]
+    T4["第 5-7 课<br/>持股三要素<br/>+ 主力行为 + 盘口"]
+    T5["第 8 课<br/>交易心理<br/>风格定性 + 舒适区"]
+
+    THEORY --> T1
+    THEORY --> T2
+    THEORY --> T3
+    THEORY --> T4
+    THEORY --> T5
+
+    %% === 实战层 · 33 节主力行为（docx）===
+    PRACTICE["<b>实战层 · 33 节主力行为</b><br/>（33 个 docx 笔记）"]
+    MIND --> PRACTICE
+
+    P1["第 1-4 节<br/>风控体系<br/>破位识别 + 弃庄"]
+    P2["第 5-8 节<br/>买点体系<br/>启动·低位换手·三低妖股"]
+    P3["第 9-10 节<br/>独立行情<br/>V 型反转 + 机构票"]
+    P4["第 11-14 节<br/>盘整突破<br/>主力性质 + 缺口理论"]
+    P5["第 15-17 节<br/>调整判断<br/>良性 vs 恶性 + 洗盘"]
+    P6["第 18-20 节<br/>一波流主升<br/>30-50% 安全区间"]
+    P7["第 21-33 节<br/>深化专题<br/>主升全程 + 波浪理论"]
+
+    PRACTICE --> P1
+    PRACTICE --> P2
+    PRACTICE --> P3
+    PRACTICE --> P4
+    PRACTICE --> P5
+    PRACTICE --> P6
+    PRACTICE --> P7
+
+    %% === 决策中枢 ===
+    HUB{"<b>买入决策中枢</b><br/>4 问必答<br/>结构 + 买点 + 量能 + 主力"}
+    T1 --> HUB
+    T2 --> HUB
+    T3 --> HUB
+    P2 --> HUB
+    P3 --> HUB
+
+    %% === 持仓 / 卖出 ===
+    HOLD["<b>持股诊断</b><br/>三要素 + 见顶信号"]
+    SELL["<b>卖出优先级</b><br/>加速见顶 > 三破 > 趋势破"]
+    HUB --> HOLD
+    HOLD --> SELL
+    T4 --> HOLD
+    P5 --> HOLD
+
+    classDef title fill:#0a0e1a,stroke:#f1c40f,stroke-width:4px,color:#f1c40f
+    classDef mind fill:#131826,stroke:#e67e22,stroke-width:3px,color:#e8eaf0
+    classDef theory fill:#131826,stroke:#3498db,stroke-width:3px,color:#e8eaf0
+    classDef practice fill:#131826,stroke:#9b59b6,stroke-width:3px,color:#e8eaf0
+    classDef chapter fill:#1a2238,stroke:#2d3a55,stroke-width:2px,color:#e8eaf0
+    classDef hub fill:#2d3a55,stroke:#2ecc71,stroke-width:4px,color:#2ecc71
+    classDef action fill:#131826,stroke:#e74c3c,stroke-width:2px,color:#e8eaf0
+
+    class TITLE,title title
+    class MIND,mind mind
+    class THEORY,theory theory
+    class PRACTICE,practice practice
+    class T1,T2,T3,T4,T5,P1,P2,P3,P4,P5,P6,P7 chapter
+    class HUB hub
+    class HOLD,SELL action
+      </div>
+
+      <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-yellow); padding: 16px; border-radius: 6px; margin-top: 16px;">
+        <div style="color: var(--accent-yellow); font-weight: 700; margin-bottom: 8px;">📖 双层架构说明</div>
+        <ul style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+          <li><b>理论层 · 8 课</b>（8 个 PDF：强化学习一~八）→ <b>什么时候能买 / 什么时候该卖</b>——顶层思维 + 买点形态 + 持股心理</li>
+          <li><b>实战层 · 33 节主力行为</b>（33 个 docx 笔记）→ <b>具体场景怎么用</b>——风控 / 买点 / 独立行情 / 盘整突破 / 调整 / 主升全程 / 深化专题</li>
+          <li><b>不是两套课程</b>，而是<b>同一套大爷法则的不同抽象层级</b>：8 课讲「道」，33 节讲「术的细化场景」</li>
+          <li><b>理论层 → 实战层 → 决策中枢</b>：从心智到形态到具体买点，4 问必答验证 → 持股诊断 → 卖出优先级</li>
+          <li><b>学习顺序建议</b>：先通读 8 课建立心智，再分章节看 33 节看实战落地，最后用决策中枢做盘中判断</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎯</span>3 种工作模式</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 8px;">
+          <h4 style="color: var(--accent-blue); margin-bottom: 8px;">📊 模式 1 · 单股深度分析</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">输入股票代码+走势描述<br>输出完整分析报告</p>
+          <div style="margin-top: 12px;">
+            <span class="tag tag-blue">5 步流程</span>
+            <span class="tag tag-green">买入/等待/放弃</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-purple); padding: 16px; border-radius: 8px;">
+          <h4 style="color: var(--accent-purple); margin-bottom: 8px;">🔍 模式 2 · 批量扫描</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">输入股池（CSV/Excel）<br>输出强势结构清单</p>
+          <div style="margin-top: 12px;">
+            <span class="tag tag-orange">5 步筛选</span>
+            <span class="tag tag-yellow">⭐⭐⭐⭐⭐ 排序</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-orange); padding: 16px; border-radius: 8px;">
+          <h4 style="color: var(--accent-orange); margin-bottom: 8px;">📋 模式 3 · 持仓诊断</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">输入持仓信息<br>输出持股三要素诊断</p>
+          <div style="margin-top: 12px;">
+            <span class="tag tag-red">健康/警戒/熔断</span>
+            <span class="tag tag-green">3 数据源</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🚨</span>4 条核心原则</div>
+      <div style="display: grid; gap: 12px;">
+        <div class="iron-rule">
+          <div class="rule-title">原则 1：大爷体系 = 唯一核心底层逻辑</div>
+          <div class="rule-content">任何分析、任何建议、任何决策都必须基于大爷强化学习8课体系。个人沉淀表是本地化落地，不是独立的第二套逻辑。</div>
+        </div>
+        <div class="iron-rule">
+          <div class="rule-title">原则 2：冲突检测必须告知</div>
+          <div class="rule-content">检测到冲突时必须主动指出、给出标准处理方式、等用户决策。❌ 不得默认按冲突规则走</div>
+        </div>
+        <div class="iron-rule">
+          <div class="rule-title">原则 3：个人纪律不可越权</div>
+          <div class="rule-content">风控铁律（仓位40%/周亏-10%/回撤-20%）是用户的硬性纪律，AI 不得越权建议。</div>
+        </div>
+        <div class="iron-rule">
+          <div class="rule-title">原则 4：🚨 标的来源白名单铁律（永久）</div>
+          <div class="rule-content">
+            ① 标的必须从用户上传图片/文字中识别 ❌ 严禁凭空编造<br>
+            ② 必须扫描图片块确认有几张图 ❌ 严禁假设<br>
+            ③ 仅限本会话讨论过的标的 ❌ 严禁擅自加入<br>
+            ④ 用户明确说"推荐"才能推送 ❌ 严禁主动推送
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 2: 强势结构 ============== -->
+  <div class="tab-content" id="structure">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🏗️</span>强势结构识别（第一课）</div>
+      <div style="background: linear-gradient(135deg, rgba(231,76,60,0.1), rgba(231,76,60,0.05)); border: 1px solid var(--accent-red); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div style="font-size: 18px; font-weight: 700; color: var(--accent-red);">核心一句话</div>
+        <div style="font-size: 20px; color: var(--text-primary); margin-top: 8px;">
+          <span class="highlight">只买两种形态，其他都不是你的菜</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--accent-green); border-radius: 8px; padding: 20px;">
+          <h4 style="color: var(--accent-green); margin-bottom: 12px;">✅ 形态 1 · 底部起涨箱体</h4>
+          <table class="data-table">
+            <tr><td><b>形态特征</b></td><td>箱体套箱体 + 突破放量</td></tr>
+            <tr><td><b>主力行为</b></td><td>主力仓位重、成本集中</td></tr>
+            <tr><td><b>适用场景</b></td><td><span class="tag tag-green">启动初期</span></td></tr>
+          </table>
+        </div>
+        <div style="background: var(--bg-secondary); border: 1px solid var(--accent-green); border-radius: 8px; padding: 20px;">
+          <h4 style="color: var(--accent-green); margin-bottom: 12px;">✅ 形态 2 · 趋势性碎步上行</h4>
+          <table class="data-table">
+            <tr><td><b>形态特征</b></td><td>沿5/10日均线 + 窄幅震荡</td></tr>
+            <tr><td><b>主力行为</b></td><td>高度控盘、不引起波动</td></tr>
+            <tr><td><b>适用场景</b></td><td><span class="tag tag-yellow">主升段</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📊</span>市值划分标准</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>分类</th>
+            <th>市值范围</th>
+            <th>特征</th>
+            <th>操盘策略</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-green">大盘</span></td>
+            <td>&gt; 500亿</td>
+            <td>多资金轮动，可能横盘后新波段</td>
+            <td>等第二根K线佐证，趋势线止损</td>
+          </tr>
+          <tr style="background: rgba(46,204,113,0.05);">
+            <td><span class="tag tag-yellow">中盘 ⭐</span></td>
+            <td>100-500亿</td>
+            <td>主要战场，主力行为清晰</td>
+            <td><b>放量破5日线立即离场</b></td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-red">小盘</span></td>
+            <td>50-100亿</td>
+            <td>❌ 不碰</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-red">微盘</span></td>
+            <td>&lt; 50亿</td>
+            <td>❌ 坚决不碰</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 3: 6类买点 ============== -->
+  <div class="tab-content" id="buypoints">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">💎</span>6 类买点体系</div>
+
+      <div class="buy-point-grid">
+        <div class="buy-point-card level-3">
+          <h4>1. 大长腿 <span class="priority">⭐⭐⭐⭐</span></h4>
+          <p><b>形态：</b>长下影+次日阳/涨停<br>
+          <b>位置：</b>箱体突破后第2-3根<br>
+          <b>量能：</b>不纠结放量</p>
+        </div>
+
+        <div class="buy-point-card level-4">
+          <h4>2. 低位反包 <span class="priority">⭐⭐⭐⭐</span></h4>
+          <p><b>形态：</b>阴线后阳线覆盖<br>
+          <b>位置：</b>0-30%涨幅区间<br>
+          <b>量能：</b>阳线放量/阴线缩量</p>
+        </div>
+
+        <div class="buy-point-card level-3">
+          <h4>3. 上影线+阳线 <span class="priority">⭐⭐⭐</span></h4>
+          <p><b>形态：</b>上影线被次日阳覆盖<br>
+          <b>位置：</b>低位首冲高回落<br>
+          <b>量能：</b>需放量</p>
+        </div>
+
+        <div class="buy-point-card level-3" style="border-left-color: var(--accent-orange);">
+          <h4>4. 出坑换手 <span class="priority">⭐⭐⭐</span></h4>
+          <p><b>形态：</b>一字板突破+首次大换手<br>
+          <b>位置：</b>长期整理后突破<br>
+          <b>量能：</b>突破时2-3倍量</p>
+          <div style="margin-top: 8px;"><span class="tag tag-red">⚠️ 高风险</span></div>
+        </div>
+
+        <div class="buy-point-card level-4">
+          <h4>5. 修复结构 <span class="priority">⭐⭐⭐⭐</span></h4>
+          <p><b>形态：</b>上涨→回调→再破前高<br>
+          <b>位置：</b>上升趋势中<br>
+          <b>量能：</b>横盘后阳线放量</p>
+        </div>
+
+        <div class="buy-point-card level-5">
+          <h4>6. 主升浪进场 <span class="priority" style="color: #ff6b6b;">⭐⭐⭐⭐⭐</span></h4>
+          <p><b>形态：</b>大盘多头+板块主线+缩量上涨<br>
+          <b>位置：</b>主升趋势中<br>
+          <b>量能：</b>缩量/平量最佳</p>
+          <div style="margin-top: 8px;"><span class="tag tag-red">🎯 核心买点</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">✅</span>买点决策树（4 问必答）</div>
+      <div class="decision-tree">
+出现买点形态
+  ↓
+【前提1】是否在箱体突破阶段？   → 否，放弃
+【前提2】主力获利空间 &lt; 30%？   → 否，警惕洗盘
+【前提3】是否在突破后第2-3根？  → 否，确定性降低
+【验证】分时异常（震荡/堆量/对敲）？ → 否，等待
+  ↓
+全部 ✅ → 介入
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🔧</span>自动数据分析引擎（v0.10）</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px;">
+<pre style="color: var(--text-primary); margin: 0;">
+from src.stock_data.daye_analyzer import analyze_stock, analyze_and_report
+
+# 方式1：返回结构化数据
+result = analyze_stock("002407")
+print(result["final_decision"]["decision"])
+
+# 方式2：返回格式化报告
+report = analyze_and_report("002407")
+print(report)
+</pre>
+      </div>
+      <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
+        <div class="factor"><div class="check">✅</div><div class="name">东方财富API</div></div>
+        <div class="factor"><div class="check">✅</div><div class="name">MACD/KDJ/布林带</div></div>
+        <div class="factor"><div class="check">✅</div><div class="name">强势结构识别</div></div>
+        <div class="factor"><div class="check">✅</div><div class="name">5类买点扫描</div></div>
+        <div class="factor"><div class="check">✅</div><div class="name">决策树验证</div></div>
+        <div class="factor"><div class="check">✅</div><div class="name">持股诊断</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 4: 主升浪 ============== -->
+  <div class="tab-content" id="mainwave">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🚀</span>主升浪进场 5 大要素</div>
+      <div class="factor-grid">
+        <div class="factor">
+          <div class="check">✅</div>
+          <div class="name">大盘处于多头趋势</div>
+        </div>
+        <div class="factor">
+          <div class="check">✅</div>
+          <div class="name">所属板块是市场主线</div>
+        </div>
+        <div class="factor">
+          <div class="check">✅</div>
+          <div class="name">出现左侧或右侧信号</div>
+        </div>
+        <div class="factor">
+          <div class="check">✅</div>
+          <div class="name">不出现大幅放量</div>
+        </div>
+        <div class="factor">
+          <div class="check">✅</div>
+          <div class="name">股价在趋势线之上</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📊</span>左侧 vs 右侧信号</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 8px;">
+          <h4 style="color: var(--accent-blue); margin-bottom: 8px;">🎯 左侧信号（优先）</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            <b>信号：</b>3根不创新低小K线 / 十字星<br>
+            <b>适用：</b>保守型投资者<br>
+            <b>特点：</b><span class="success-text">更安全，确定性高</span>
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-orange); padding: 16px; border-radius: 8px;">
+          <h4 style="color: var(--accent-orange); margin-bottom: 8px;">⚡ 右侧信号</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            <b>信号：</b>突破阳线<br>
+            <b>适用：</b>激进型投资者<br>
+            <b>特点：</b><span class="highlight">需量能验证</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🌊</span>五浪结构与三浪主升</div>
+
+      <div class="wave-diagram">
+        <div class="wave wave-1">
+          <span class="wave-label">1浪 · 30%</span>
+        </div>
+        <div class="wave wave-2">
+          <span class="wave-label">2浪 · 20%</span>
+        </div>
+        <div class="wave wave-3">
+          <span class="wave-label">3浪 ⭐ 100%</span>
+        </div>
+        <div class="wave wave-4">
+          <span class="wave-label">4浪 · 70%</span>
+        </div>
+        <div class="wave wave-5">
+          <span class="wave-label">5浪 · 90%</span>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>浪</th>
+            <th>特征</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1浪</td><td>首次拉升</td><td><span class="tag tag-green">持股</span></td></tr>
+          <tr><td>2浪</td><td>回调不破1/2</td><td><span class="tag tag-blue">观察</span></td></tr>
+          <tr style="background: rgba(231,76,60,0.05);">
+            <td>3浪 ⭐</td><td><b>主升浪</b></td><td><span class="tag tag-red">🎯 重点参与</span></td>
+          </tr>
+          <tr><td>4浪</td><td>宽幅震荡</td><td><span class="tag tag-red">❌ 不参与</span></td></tr>
+          <tr><td>5浪</td><td>诱多</td><td><span class="tag tag-red">❌ 规避</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📈</span>主升浪见顶 3 个危险信号</div>
+      <div style="display: grid; gap: 12px;">
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">🔴 异常放量</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">大阳线 + 天量</div>
+        </div>
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">🔴 加速赶顶</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">连续大阳线 + 成交量激增</div>
+        </div>
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">🔴 趋势线被有效跌破</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">关键支撑位失守</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 5: 卖出体系 ============== -->
+  <div class="tab-content" id="sell">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">⚖️</span>持股三要素（持续自问）</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>要素</th>
+            <th>问什么</th>
+            <th>离场标准</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-red">趋势破坏</span></td>
+            <td>股价是否破位</td>
+            <td>
+              <b>中盘：</b>放量破5日均线立即离场<br>
+              <b>大盘：</b>等第二根K线佐证（第一根跌幅≥5%则立即止损）
+            </td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-yellow">逻辑结束</span></td>
+            <td>主逻辑还在不在</td>
+            <td>媒体/研报减少 + 个股阴跌</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-orange">主力出货</span></td>
+            <td>主力跑没跑</td>
+            <td>
+              加速放量后阴线 = 出货<br>
+              趋势线破位 = 离场
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎯</span>卖出优先级</div>
+      <div class="flow">
+        <div class="flow-step danger">
+          <b>🥇 1. 趋势破位</b>（破5日均线 / 破修正趋势线）→ 立即离场
+        </div>
+        <div class="flow-step warning">
+          <b>🥈 2. 逻辑结束</b>（主逻辑不再被市场关注）→ 减仓
+        </div>
+        <div class="flow-step success">
+          <b>🥉 3. 主力出货</b>（放量阴线 + 加速结构）→ 清仓
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🌊</span>洗盘 vs 出货 三要素验证</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid var(--accent-yellow);">
+        <div style="font-weight: 700; color: var(--accent-yellow); margin-bottom: 8px;">⚠️ 必须同时满足才出货</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 13px;">
+✅ 放量异常<br>
+✅ 结构破坏（破位）<br>
+✅ 主力特征盘口出现（夹板/托单/脉冲式拉升等）<br>
+<br>
+<span class="highlight">只要有一个不满足，就不是出货！</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-secondary); border-radius: 8px; padding: 16px;">
+          <h4 style="color: var(--accent-blue); margin-bottom: 8px;">🌀 日内洗盘</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            <b>触发：</b>主力控盘度高 + 获利盘少<br>
+            <b>表现：</b>分时剧烈震荡 + 日K带影线<br>
+            <b>判断：</b>次日必须阳线修复
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); border-radius: 8px; padding: 16px;">
+          <h4 style="color: var(--accent-purple); margin-bottom: 8px;">📦 技术结构洗盘</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            <b>触发：</b>到达主力目标位 + 获利盘 &gt; 50%<br>
+            <b>表现：</b>箱体震荡（时间更长）<br>
+            <b>判断：</b>箱体下沿有效跌破 = 出货
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📊</span>主力行为五阶段模型</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto;">
+<pre style="color: var(--text-primary); margin: 0;">
+底部建仓 → 拉升成本区 → 洗盘抬成本 → 主升加速 → 高位派发
+   ↓            ↓            ↓            ↓            ↓
+ 量价异动    首次拉升      震荡洗盘    量价齐升    诱多出货
+ (1阶段)     (2阶段)      (3阶段)     (4阶段)     (5阶段)
+
+散户只在 3→4 阶段参与（主力最舒适、最安全）
+</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">💎</span>黄金法则</div>
+      <div style="background: linear-gradient(135deg, rgba(241,196,15,0.1), rgba(241,196,15,0.05)); border: 1px solid var(--accent-yellow); border-radius: 8px; padding: 20px; text-align: center;">
+        <div style="font-size: 18px; font-weight: 700; color: var(--accent-yellow); line-height: 1.8;">
+          结构未破前所有 K 线视为洗盘<br>
+          破位后所有 K 线视为出货
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 6: 风控铁律 ============== -->
+  <div class="tab-content" id="risk">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🚨</span>资金层面风控铁律</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>项</th><th>阈值</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>单股最大仓位</td><td><b>40%</b></td><td>避免重仓单只</td></tr>
+          <tr><td>周最大亏损</td><td><b>-10%</b></td><td>触发即停盘 1 周复盘</td></tr>
+          <tr style="background: rgba(231,76,60,0.05);">
+            <td>总回撤熔断线</td><td><b>-20%</b></td><td>触发即停止交易，重新评估体系</td>
+          </tr>
+          <tr><td>日最大亏损</td><td>-5%</td><td>大爷默认</td></tr>
+          <tr><td>同时持仓上限</td><td>3 只</td><td>集中跟踪主力行为</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🚫</span>行为禁忌</div>
+      <div style="display: grid; gap: 12px;">
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">不追高</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">涨幅 &gt; <b>7%</b> 不追 · 大爷体系：避开加速赶顶</div>
+        </div>
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">不抄底</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">下跌 &gt; <b>10%</b> 不接飞刀 · 大爷体系：避免接出货</div>
+        </div>
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">晚上不开盘决策</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">晚上/凌晨不做买卖决策 · 避免情绪化</div>
+        </div>
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">不碰纯题材股</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">必须有技术结构配合 · 大爷第1课：强势结构是基础</div>
+        </div>
+        <div style="background: rgba(231,76,60,0.1); border-left: 4px solid var(--accent-red); padding: 16px; border-radius: 8px;">
+          <div class="danger-text">不在下跌趋势操作</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">下降趋势的盘口无分析价值 · 大爷第7课：趋势优先</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🧠</span>心理铁律</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>铁律</th><th>规则</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>连续亏损 3 笔强制休息 1 天</td><td>避免复仇交易、情绪化</td></tr>
+          <tr><td>大赚后不加仓</td><td>防止过度自信</td></tr>
+          <tr><td>错过不买（不 FOMO）</td><td>龙头股错过就等下一次机会</td></tr>
+          <tr><td>只做认知范围内交易</td><td>只参与主力拉升舒适区（3-4 阶段）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📏</span>止盈原则</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+        <div style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 2;">
+0% ──── <span class="success-text">30%</span> ──── <span class="success-text">50%</span> ──── 100%<br>
+启动     洗盘       洗盘       风险<br>
+&nbsp;       <span class="highlight">★ 安全区间 30-50% ★</span>
+        </div>
+      </div>
+      <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
+        <div class="factor"><div class="check">✅</div><div class="name">吃主升 30-40 个点</div></div>
+        <div class="factor"><div class="check">✅</div><div class="name">宁卖飞也不冒险</div></div>
+        <div class="factor"><div class="check" style="color: var(--accent-red);">❌</div><div class="name">不设固定目标价</div></div>
+        <div class="factor"><div class="check" style="color: var(--accent-red);">❌</div><div class="name">不做移动止盈</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 7: 33节主力行为 · 已总结 1-20 节 ============== -->
+  <div class="tab-content" id="expand">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📚</span>33 节主力行为 · 知识地图（已总结 1-20 节，21-33 节进行中）</div>
+      <div class="knowledge-map">
+┌──────────────────────────────────────────────────────────────┐
+│              33 节主力行为 · 知识地图（v0.13 重命名）           │
+├──────────────────────────────────────────────────────────────┤
+│ 【风控篇】第1-4节：破位识别与风控原则                          │
+│   ├ 下降趋势破位：放量立即离场 / 缩量观察3天               │
+│   ├ 盘整结构破位：高位立即离场 / 低位加速赶底               │
+│   └ 弃庄行为：小盘股直线下跌 = 主力放弃控盘                │
+├──────────────────────────────────────────────────────────────┤
+│ 【买点篇】第5-8节：三大买点体系                               │
+│   ├ 第5节：个股启动买点（倒推法分析主力）                    │
+│   ├ 第6节：低位换手买点（大长腿 + 杯柄图形）                 │
+│   └ 第7节：三低票妖股买点（低价+小盘+筹码干净）              │
+├──────────────────────────────────────────────────────────────┤
+│ 【特殊行情篇】第9-10节                                       │
+│   ├ 第9节：V型反转/独立行情（缩量上涨=机构控盘）             │
+│   └ 第10节：机构票V型反转（三根大阳线+二次确认）             │
+├──────────────────────────────────────────────────────────────┤
+│ 【买点深化篇】第11-14节                                      │
+│   ├ 第11节：盘整突破 + 左侧/右侧信号                        │
+│   ├ 第12节：主力性质（老庄/单一主力/机构）                   │
+│   ├ 第13节：强势启动 + 缺口理论                              │
+│   └ 第14节：过度放量识别                                     │
+├──────────────────────────────────────────────────────────────┤
+│ 【调整判断篇】第15-17节                                      │
+│   ├ 第15节：良性回调 vs 恶性调整                             │
+│   ├ 第16节：假阴线 + 空中加油结构                            │
+│   └ 第17节：连续线启动 + N型修复结构                         │
+├──────────────────────────────────────────────────────────────┤
+│ 【主升浪篇】第18-20节                                        │
+│   ├ 第18节：一波流主升浪（30-50%安全区间）                   │
+│   ├ 第19节：主升趋势中主力手法 + 趋势线控盘                  │
+│   └ 第20节：波浪理论应用（五浪结构 + 三浪主升）               │
+├──────────────────────────────────────────────────────────────┤
+│ 【深化专题】第21-33节（进行中）                              │
+│   └ 主力行为深化 + 实战案例（待总结）                        │
+└──────────────────────────────────────────────────────────────┘
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🚨</span>破位识别与风控（33 节第 1-4 节）</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>破位类型</th><th>特征</th><th>处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="tag tag-red">放量破位</span></td><td>成交量明显放大</td><td><b>❌ 无条件立即离场</b></td></tr>
+          <tr><td><span class="tag tag-yellow">缩量破位</span></td><td>成交量萎缩</td><td>⏱️ 观察3天能否收回</td></tr>
+          <tr><td><span class="tag tag-orange">早盘破位</span></td><td>上升趋势中早盘杀跌</td><td>观察二次出货信号</td></tr>
+          <tr><td><span class="tag tag-blue">尾盘破位</span></td><td>高位放量/低位缩量</td><td>区别对待</td></tr>
+          <tr><td><span class="tag tag-red">盘中直线杀跌</span></td><td>横盘后突然下杀</td><td><b>❌ 立即离场</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎯</span>启动买点倒推三要素（33 节第 5 节）</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px;">
+① 吃货区域：连续阳线+放量+上下影线+分时堆量<br>
+② 蓄势阶段：压力位窄幅振荡+持续放量不回落<br>
+③ 试盘行为：频繁上影线+早盘快速冲高回落
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">💎</span>三低妖股买点（33 节第 7 节）</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>条件</th><th>标准</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>价格</td><td>≤ 10 元</td></tr>
+          <tr><td>盘子</td><td>30-50亿 流通盘</td></tr>
+          <tr><td>筹码</td><td>长期阴跌无主力</td></tr>
+          <tr style="background: rgba(231,76,60,0.05);">
+            <td><b>三板成妖</b></td><td>一板观察 → 二板确认 → 三板介入</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📊</span>缺口理论（33 节第 13 节）</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>缺口</th><th>特征</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>起涨缺口</td><td>行情起点不补</td><td><span class="tag tag-green">防守位</span></td></tr>
+          <tr><td>中继缺口</td><td>阳线实体一致</td><td><span class="tag tag-green">继续持有</span></td></tr>
+          <tr style="background: rgba(231,76,60,0.05);">
+            <td>衰竭缺口</td><td>小实体+放量</td><td><span class="tag tag-red">❌ 立即离场</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📦</span>主力性质识别（第12讲）</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>类型</th><th>盘子</th><th>操作策略</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>老庄票</td><td>&lt; 50亿</td><td>快进快出，阴线即离</td></tr>
+          <tr style="background: rgba(46,204,113,0.05);">
+            <td>单一主力</td><td>50-150亿</td><td>稳定持股30-50%洗盘</td>
+          </tr>
+          <tr><td>机构票</td><td>&gt; 150亿</td><td>只做一致性预期</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📈</span>30-50% 安全区间（第18讲）</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; text-align: center;">
+        <div style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 2;">
+0% ──── <span class="success-text">30%</span> ──── <span class="success-text">50%</span> ──── 100%<br>
+启动     洗盘       洗盘       风险<br>
+&nbsp;       <span class="highlight">★ 一波流安全区间 30-50% ★</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🔍</span>良性 vs 恶性 调整（第15讲）</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>类型</th><th>K线</th><th>量能</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          <tr style="background: rgba(46,204,113,0.05);">
+            <td><span class="tag tag-green">良性</span></td>
+            <td>阴阳组合非连续</td>
+            <td>缩量</td>
+            <td>持股</td>
+          </tr>
+          <tr style="background: rgba(231,76,60,0.05);">
+            <td><span class="tag tag-red">恶性</span></td>
+            <td>连续阴线</td>
+            <td>放量</td>
+            <td><b>❌ 离场</b></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📋</span>假阴线处理（第16讲）</div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px;">
+首根阴线 → 减仓 30-50%<br>
+次日收阳在5日线上 → 回补<br>
+次日破5日线 → 清仓
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">⛽</span>空中加油结构（第16讲）</div>
+      <div style="display: grid; gap: 8px;">
+        <div style="background: var(--bg-secondary); padding: 12px; border-radius: 6px;">
+          ✓ 横盘时间：≤ <b>7-8</b> 个交易日
+        </div>
+        <div style="background: var(--bg-secondary); padding: 12px; border-radius: 6px;">
+          ✓ 阳线居多
+        </div>
+        <div style="background: var(--bg-secondary); padding: 12px; border-radius: 6px;">
+          ✓ <b>5日均线</b> 防守
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============== Tab 8: 思维导图 ============== -->
+  <div class="tab-content" id="mindmap">
+
+    <div class="section">
+      <div class="section-title"><span class="icon">📐</span>知识图谱关系图（大爷法则体系）</div>
+      <div style="background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(52,152,219,0.05)); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: center;">
+        <div style="color: var(--accent-blue); font-size: 14px;">
+          📐 基于 Mermaid 10.9 flowchart 渲染 · 3 层知识流 · 8 大模块 · 30+ 节点
+        </div>
+        <div style="color: var(--text-secondary); font-size: 12px; margin-top: 8px;">
+          💡 心智 → 理论 → 实战 → 决策 → 持仓 → 卖出 → 风控 · 完整闭环
+        </div>
+      </div>
+
+      <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; overflow: auto;">
+<div class="mermaid">
+flowchart TD
+    ROOT["大爷法则体系"]
+
+    M1["顶层心智模型"]
+    M2["8课理论框架"]
+    M3["33节主力行为实战"]
+
+    M1 --> M1A["盘口是仆人结构是主人"]
+    M1 --> M1B["主力视角"]
+    M1 --> M1C["吃主升30-40点"]
+
+    M2 --> C1["第1课强势结构"]
+    M2 --> C2["第2-3课5类买点"]
+    M2 --> C3["第4课主升浪"]
+    M2 --> C4["第5-7课持股三要素"]
+    M2 --> C5["第8课交易心理"]
+
+    M3 --> E1["风控篇破位识别"]
+    M3 --> E2["买点篇三大买点"]
+    M3 --> E3["主升浪篇全程攻略"]
+
+    C1 --> STRUCT["底部起涨箱体趋势性碎步上行"]
+    C2 --> BUY["大长腿反包上影线出坑修复"]
+    C3 --> WAVE["5浪结构三浪主升"]
+    C4 --> HOLD["趋势逻辑主力出货"]
+    C5 --> PSYCH["风格定性舒适区原则"]
+
+    STRUCT --> ACTION{"买入决策"}
+    BUY --> ACTION
+    WAVE --> ACTION
+    ACTION -->|买入| POS["持仓"]
+    POS --> HOLD
+    HOLD -->|破位| SELL["卖出"]
+    HOLD -->|逻辑结束| SELL
+    HOLD -->|主力出货| SELL
+
+    E1 --> RISK["风控铁律"]
+    E2 --> BUY
+    E3 --> WAVE
+    RISK --> STOP["止损止盈"]
+
+    classDef root fill:#e74c3c,stroke:#fff,stroke-width:3px,color:#fff
+    classDef mind fill:#f1c40f,stroke:#000,stroke-width:2px,color:#000
+    classDef theory fill:#3498db,stroke:#fff,stroke-width:2px,color:#fff
+    classDef expand fill:#9b59b6,stroke:#fff,stroke-width:2px,color:#fff
+    class ROOT root
+    class M1,M2,M3 mind
+    class C1,C2,C3,C4,C5 theory
+    class E1,E2,E3 expand
+</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🎯</span>决策流程图（完整买卖闭环）</div>
+      <div style="background: linear-gradient(135deg, rgba(46,204,113,0.1), rgba(46,204,113,0.05)); border: 1px solid var(--accent-green); border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: center;">
+        <div style="color: var(--accent-green); font-size: 14px;">
+          🎯 基于 Mermaid 10.9 flowchart 渲染 · 6 类买点 + 4 道验证 + 3 要素卖出
+        </div>
+        <div style="color: var(--text-secondary); font-size: 12px; margin-top: 8px;">
+          💡 买入 6 道决策树 → 持仓 3 要素每日三问 → 止盈 30-40%
+        </div>
+      </div>
+      <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; overflow: auto;">
+<div class="mermaid">
+flowchart TD
+    START(["发现标的"]) --> Q1{"强势结构?"}
+    Q1 -->|否|放弃
+    Q1 -->|是| Q2{"买点形态?"}
+    Q2 -->|大长腿| BP1["大长腿买点"]
+    Q2 -->|阳包阴| BP2["低位反包"]
+    Q2 -->|上影线| BP3["上影线阳线"]
+    Q2 -->|出坑| BP4["出坑换手"]
+    Q2 -->|修复| BP5["修复结构"]
+    Q2 -->|主升| BP6["主升浪"]
+
+    BP1 --> V1{"决策树验证"}
+    BP2 --> V1
+    BP3 --> V1
+    BP4 --> V1
+    BP5 --> V1
+    BP6 --> V1
+
+    V1 -->|箱体突破?| V2
+    V2 -->|否|放弃
+    V2 -->|是| V3{"主力空间小于30%?"}
+    V3 -->|否|警惕
+    V3 -->|是| V4{"第2-3根阳线?"}
+    V4 -->|否|等待
+    V4 -->|是| V5{"分时异常?"}
+    V5 -->|否|等待
+    V5 -->|是| BUY["买入"]
+
+    BUY --> HOLD["持仓"]
+    HOLD --> CHECK{"每日三问"}
+    CHECK --> C1{"趋势破位?"}
+    CHECK --> C2{"逻辑结束?"}
+    CHECK --> C3{"主力出货?"}
+    C1 -->|是| SELL["卖出"]
+    C2 -->|是| SELL
+    C3 -->|是| SELL
+    C1 -->|否| HOLD
+    C2 -->|否| HOLD
+    C3 -->|否| HOLD
+
+    HOLD -->|止盈30-40%| WIN["获利了结"]
+
+    style START fill:#3498db,color:#fff
+    style BUY fill:#2ecc71,color:#000
+    style WIN fill:#f1c40f,color:#000
+    style SELL fill:#e74c3c,color:#fff
+    style 放弃 fill:#e74c3c,color:#fff
+    style 警惕 fill:#e67e22,color:#fff
+    style 等待 fill:#e67e22,color:#fff
+    style HOLD fill:#3498db,color:#fff
+    style BP1 fill:#1abc9c,color:#fff
+    style BP2 fill:#1abc9c,color:#fff
+    style BP3 fill:#1abc9c,color:#fff
+    style BP4 fill:#1abc9c,color:#fff
+    style BP5 fill:#1abc9c,color:#fff
+    style BP6 fill:#ff6b6b,color:#fff
+</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon">🔗</span>导出与使用</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent-blue);">
+          <h4 style="color: var(--accent-blue); margin-bottom: 8px;">📝 Mermaid Live Editor</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            访问 <a href="https://mermaid.live" style="color: var(--accent-yellow);">mermaid.live</a><br>
+            粘贴代码即可在线编辑
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent-green);">
+          <h4 style="color: var(--accent-green); margin-bottom: 8px;">💻 VS Code 扩展</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            安装 <code style="background: rgba(46,204,113,0.2); padding: 2px 6px; border-radius: 3px;">Markdown Preview Mermaid Support</code><br>
+            即可在 Markdown 中预览
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent-purple);">
+          <h4 style="color: var(--accent-purple); margin-bottom: 8px;">🐙 GitHub Markdown</h4>
+          <p style="color: var(--text-secondary); font-size: 13px;">
+            直接用 <code style="background: rgba(155,89,182,0.2); padding: 2px 6px; border-radius: 3px;">```mermaid</code> 代码块<br>
+            支持 mindmap / graph / flowchart / timeline
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  <div>🎯 大爷法则（daye-faze）v0.14 · 2026-08-10 22:20</div>
+  <div style="margin-top: 8px;">整合 8 课强化学习（理论）+ 33 节主力行为（实战）· 已总结 1-20 节</div>
+  <div style="margin-top: 8px; color: var(--text-secondary);">本地看板无密码门 · 推送云端时自动注入 770880</div>
+</div>
+
+<script>
+  // Tab 切换
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+
+      // 移除所有 active
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      // 激活当前
+      btn.classList.add('active');
+      document.getElementById(targetTab).classList.add('active');
+
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+<script>
+  // 初始化 Mermaid（关闭 startOnLoad，手动控制渲染）
+  mermaid.initialize({
+    startOnLoad: false,  // 关闭自动渲染，由下面的代码统一控制
+    theme: 'dark',
+    securityLevel: 'loose',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif',
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis'
+    },
+    themeVariables: {
+      primaryColor: '#1a2238',
+      primaryTextColor: '#e8eaf0',
+      primaryBorderColor: '#f1c40f',
+      lineColor: '#3498db',
+      fontSize: '14px'
+    }
+  });
+
+  // 手动渲染所有 .mermaid 元素（修复 startOnLoad 在某些环境下不工作的 bug）
+  (function() {
+    function renderAllMermaid() {
+      var mermaidDivs = document.querySelectorAll('.mermaid');
+      console.log('[Mermaid] 发现 ' + mermaidDivs.length + ' 个图表，开始渲染');
+      mermaidDivs.forEach(function(div, idx) {
+        var graph = div.textContent;
+        if (graph.trim().length === 0) return;
+        try {
+          var id = 'mermaid-svg-' + Date.now() + '-' + idx;
+          // 不清空原始文本，传入 mermaid.render
+          mermaid.render(id, graph).then(function(result) {
+            div.innerHTML = result.svg;
+          }).catch(function(err) {
+            console.error('[Mermaid] 渲染失败 #' + idx, err);
+            div.innerHTML = '<div style="background:rgba(231,76,60,0.1);border:1px solid #e74c3c;border-radius:8px;padding:16px;margin:16px 0;color:#e74c3c;">'
+              + '<b>❌ Mermaid 渲染失败</b><br>'
+              + '<pre style="white-space:pre-wrap;font-size:11px;color:#e8eaf0;margin-top:8px;">'
+              + (err.message || err.str || JSON.stringify(err))
+              + '</pre></div>';
+          });
+        } catch (e) {
+          console.error('[Mermaid] 异常 #' + idx, e);
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderAllMermaid);
+    } else {
+      renderAllMermaid();
+    }
+  })();
+</script>
+
+<!-- 密码门不在本地HTML注入，只在推送到云端时通过 inject_password_gate.py 注入 -->
+<script>
+  // 本地看板无密码门（云端推送时由 inject_password_gate.py 注入）
+  // 规则见 .cursor/rules/auto-kanban-sync.mdc v1.7
+</script>
+
+
+<script>
+// 密码 "770880" 的 SHA-256 哈希（前端比对，不存明文）
+const PW_HASH = '84eee289aaed0156541b079cd0cff292211a21339796f47c58e17f2c93d3b07a';
+
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+const pwInput = document.getElementById('pw');
+const pwBtn = document.getElementById('pwBtn');
+const pwMsg = document.getElementById('pwMsg');
+const gate = document.getElementById('gate');
+
+// 已通过认证则直接跳过（同一会话）
+if(sessionStorage.getItem('aiboard_auth')==='1'){
+  gate.style.display='none';
+}
+
+async function checkPw(){
+  const v = pwInput.value.trim();
+  if(v.length!==6){
+    pwMsg.textContent='请输入 6 位密码';
+    pwInput.classList.add('error');
+    setTimeout(()=>pwInput.classList.remove('error'),400);
+    return;
+  }
+  const h = await sha256(v);
+  if(h === PW_HASH){
+    sessionStorage.setItem('aiboard_auth','1');
+    gate.style.display='none';
+    pwInput.value='';
+    pwMsg.textContent='';
+  } else {
+    pwMsg.textContent='密码错误';
+    pwInput.classList.add('error');
+    setTimeout(()=>pwInput.classList.remove('error'),400);
+    pwInput.value='';
+    pwInput.focus();
+  }
+}
+
+if(pwBtn){ pwBtn.addEventListener('click', checkPw); }
+if(pwInput){ pwInput.addEventListener('keypress', e=>{ if(e.key==='Enter') checkPw(); }); pwInput.focus(); }
+</script>
+</body>
+</html>

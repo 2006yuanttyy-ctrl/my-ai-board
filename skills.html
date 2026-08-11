@@ -1,0 +1,1437 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛠️ Skill 库可视化看板 · v4.1 · 2026-08-09 22:30</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-elevated: #1c2128;
+    --border: #30363d;
+    --border-bright: #484f58;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent: #58a6ff;
+    --success: #3fb950;
+    --warning: #d29922;
+    --danger: #f85149;
+    --purple: #bc8cff;
+    --pink: #ff7b72;
+    --code-bg: #0d1117;
+    --code-text: #ffa657;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 32px 24px 64px;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  h1 {
+    font-size: 32px;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  .meta-pill strong { color: var(--accent); margin-right: 4px; }
+
+  /* Stats row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 900px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .stat-card.highlight {
+    border-color: var(--purple);
+    background: linear-gradient(0deg, var(--bg-card), rgba(188, 140, 255, 0.05));
+  }
+  .stat-num {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-num.purple { color: var(--purple); }
+  .stat-num.success { color: var(--success); }
+  .stat-label { color: var(--text-muted); font-size: 13px; }
+
+  /* Section */
+  h2 {
+    font-size: 22px;
+    color: var(--text);
+    margin: 40px 0 16px 0;
+    padding-left: 14px;
+    border-left: 4px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+    margin-left: 18px;
+  }
+
+  /* Skill grid */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+  .skill-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+  .skill-card:hover { border-color: var(--accent); }
+  .skill-card.highlight {
+    border-color: var(--purple);
+    background: linear-gradient(0deg, var(--bg-card), rgba(188, 140, 255, 0.05));
+  }
+  .skill-card.highlight::before {
+    content: "🔥 本会话新增";
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    background: var(--purple);
+    color: #0d1117;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .skill-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .skill-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: "Consolas", "Monaco", monospace;
+  }
+  .skill-version {
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: "Consolas", monospace;
+  }
+  .skill-version.upgraded {
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--success);
+    border: 1px solid var(--success);
+  }
+
+  .skill-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 12px;
+    min-height: 36px;
+  }
+
+  .skill-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .info-label {
+    color: var(--text-dim);
+    flex-shrink: 0;
+    width: 70px;
+    font-weight: 600;
+  }
+  .info-value {
+    color: var(--text);
+    flex: 1;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 11px;
+    word-break: break-all;
+  }
+  .info-value.normal { font-family: inherit; }
+
+  /* Update log */
+  .update-log {
+    background: var(--bg-elevated);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-left: 3px solid var(--success);
+  }
+  .update-log .v {
+    color: var(--success);
+    font-weight: 700;
+    font-family: "Consolas", monospace;
+  }
+
+  /* Trigger words */
+  .triggers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .trigger {
+    background: var(--bg-elevated);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: "Consolas", monospace;
+  }
+
+  /* Status badges */
+  .status-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 11px;
+  }
+  .status {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .status-new { background: rgba(188, 140, 255, 0.15); color: var(--purple); border: 1px solid var(--purple); }
+  .status-stable { background: rgba(63, 185, 80, 0.15); color: var(--success); border: 1px solid var(--success); }
+  .status-builtin { background: rgba(88, 166, 255, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .status-verified { background: rgba(210, 153, 34, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+
+  /* Timeline */
+  .timeline {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  .timeline-row {
+    display: flex;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .timeline-row:last-child { border-bottom: none; }
+  .timeline-date {
+    color: var(--text-muted);
+    font-family: "Consolas", monospace;
+    font-size: 13px;
+    flex-shrink: 0;
+    width: 130px;
+  }
+  .timeline-badge {
+    flex-shrink: 0;
+    width: 60px;
+    text-align: center;
+  }
+  .timeline-event {
+    color: var(--text);
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .badge-add {
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--success);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--success);
+  }
+  .badge-verify {
+    background: rgba(210, 153, 34, 0.15);
+    color: var(--warning);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--warning);
+  }
+  .badge-doc {
+    background: rgba(88, 166, 255, 0.15);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--accent);
+  }
+  .badge-update {
+    background: rgba(188, 140, 255, 0.15);
+    color: var(--purple);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--purple);
+  }
+
+  /* Workflow */
+  .workflow {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .workflow-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    flex-wrap: wrap;
+  }
+  .step-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .step-box.purple { border-color: var(--purple); color: var(--purple); }
+  .step-box.success { border-color: var(--success); color: var(--success); }
+  .step-box.accent { border-color: var(--accent); color: var(--accent); }
+  .step-arrow { color: var(--text-dim); font-size: 18px; }
+
+  /* Tip */
+  .tip {
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .tip-title {
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .tip-content { color: var(--text); font-size: 13px; line-height: 1.7; }
+  .tip-content code {
+    background: var(--bg-elevated);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "Consolas", monospace;
+    font-size: 12px;
+  }
+
+  /* Changelog */
+  .changelog {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (max-width: 700px) { .changelog { grid-template-columns: 1fr; } }
+  .changelog-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .changelog-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .changelog-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .changelog-list li {
+    padding: 4px 0;
+    color: var(--text);
+    font-size: 13px;
+    padding-left: 16px;
+    position: relative;
+  }
+  .changelog-list li::before {
+    content: "→";
+    color: var(--success);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  /* Search */
+  .filter-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .filter-input:focus { outline: none; border-color: var(--accent); }
+  .filter-label { color: var(--text-muted); font-size: 13px; }
+
+/* ========== 密码门 ========== */
+.gate{position:fixed;inset:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:99999}
+.gate-box{background:#161b22;border-radius:20px;padding:40px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;border:1px solid #30363d}
+.gate-box h2{margin:0 0 8px;font-size:20px;color:#e6edf3}
+.gate-box .hint{color:#8b949e;font-size:12px;margin:0 0 20px}
+.pw-input{width:100%;padding:14px;font-size:18px;border:2px solid #30363d;border-radius:10px;text-align:center;letter-spacing:8px;font-weight:bold;outline:none;transition:border .2s;background:#0d1117;color:#e6edf3}
+.pw-input:focus{border-color:#58a6ff}
+.pw-input.error{border-color:#da3633;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pw-btn{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.pw-btn:active{opacity:.85}
+.pw-msg{color:#da3633;font-size:12px;margin-top:10px;min-height:16px}
+.lock-icon{font-size:36px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<!-- ========== 密码门 ========== -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <div class="lock-icon">🔒</div>
+    <h2>d: -AI-project 看板</h2>
+    <p class="hint">请输入 6 位访问密码</p>
+    <input id="pw" class="pw-input" type="password" inputmode="numeric" maxlength="6" placeholder="******" autocomplete="off">
+    <button id="pwBtn" class="pw-btn">进入</button>
+    <div id="pwMsg" class="pw-msg"></div>
+  </div>
+</div>
+
+<div class="container">
+
+<header>
+  <h1>🛠️ Skill 库可视化看板 v4</h1>
+  <div class="subtitle">
+    <span class="meta-pill"><strong>v3.0</strong>2026-08-08 17:45</span>
+    <span class="meta-pill"><strong>数据源</strong>00-meta/skill-registry.md</span>
+    <span class="meta-pill"><strong>路径</strong>~/.cursor/skills/ + ~/.cursor/skills-cursor/</span>
+    <span class="meta-pill" style="border-color: var(--purple);"><strong style="color: var(--purple);">本批新增</strong>14 个 Anthropic 官方 Skill</span>
+  </div>
+</header>
+
+<!-- ============ v3 → v4 变更摘要 ============ -->
+<h2>📋 v3 → v4 变更摘要</h2>
+<div class="changelog">
+  <div class="changelog-card">
+    <div class="changelog-tag" style="background:#3fb950;color:#fff;">🆕 +14</div>
+    <div class="changelog-content">
+      <strong>新增 Anthropic 官方批次 v2026-08-09</strong>
+      <p>从 <a href="https://github.com/anthropics/skills/tree/main/skills" style="color:var(--accent);">anthropics/skills</a> 克隆 14 个官方 Skill：docx / xlsx / pptx / skill-creator / mcp-builder / frontend-design / canvas-design / web-artifacts-builder / webapp-testing / theme-factory / brand-guidelines / claude-api / internal-comms / algorithmic-art</p>
+    </div>
+  </div>
+  <div class="changelog-card">
+    <div class="changelog-tag" style="background:var(--warning);color:#fff;">🔀 重命名</div>
+    <div class="changelog-content">
+      <strong>generate-presentation → markdown-to-html-ppt</strong>
+      <p>避免与官方 <code>pptx</code> Skill 触发词冲突。功能边界：本地版输出 HTML+PDF，官方 <code>pptx</code> 输出 .pptx 二进制。</p>
+    </div>
+  </div>
+  <div class="changelog-card">
+    <div class="changelog-tag" style="background:var(--accent);color:#fff;">🔍 验证</div>
+    <div class="changelog-content">
+      <strong>pdf / doc-coauthoring 字节级比对</strong>
+      <p>两个 Skill 经 MD5 + 字节级对比，确认本地版就是 Anthropic 官方原版，仅 CRLF (Windows) ↔ LF (Unix) 换行符差异。</p>
+    </div>
+  </div>
+</div>
+    <div class="changelog-title">🆕 新增的 Skill</div>
+    <div class="changelog-meta">2026-08-08 17:45 · 部署/发布分类</div>
+    <ul class="changelog-list">
+      <li><strong>gh-pages-auto-deploy v1.0</strong> — 看板 HTML 一键部署到 GitHub Pages（180 行，Token 安全约束）</li>
+    </ul>
+  </div>
+  <div class="changelog-card">
+    <div class="changelog-title">✅ 实战验证</div>
+    <div class="changelog-meta">本会话产生的实际成果</div>
+    <ul class="changelog-list">
+      <li>成功生成 schedule 模块（7 文件 600 行）</li>
+      <li>32 个测试用例如期通过、93% 覆盖</li>
+      <li>首次生成 Skill 库看板 v1.0 共 1023 行</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ Stats ============ -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-num">51</div>
+    <div class="stat-label">Skill 总数</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">31</div>
+    <div class="stat-label">自定义 Skill</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">20</div>
+    <div class="stat-label">Cursor 内置</div>
+  </div>
+  <div class="stat-card highlight">
+    <div class="stat-num purple">14</div>
+    <div class="stat-label">Anthropic 官方新增</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num success">3</div>
+    <div class="stat-label">已实战验证</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">🔍 筛选：</span>
+  <input type="text" class="filter-input" id="filterInput" placeholder="输入 Skill 名 / 触发词 / 功能关键词...">
+  <span style="color: var(--text-dim); font-size: 12px;">实时过滤显示</span>
+</div>
+
+<!-- ============ Section 1: 项目专用 Skill ============ -->
+<h2>🔥 一、项目专用 Skill</h2>
+<p class="section-desc">为本会话 AI 个人效能系统项目定制 · 2026-08-08 创建</p>
+
+<div class="skill-grid">
+
+  <div class="skill-card highlight" data-search="fastapi crud generator 生成 CRUD 实现 增删改查 schedule task">
+    <div class="skill-header">
+      <div class="skill-name">fastapi-crud-generator</div>
+      <div class="skill-version upgraded">v1.1</div>
+    </div>
+    <div class="skill-desc">生成 FastAPI 后端 CRUD 完整模块（model + schema + crud + router 四件套），遵循现有项目风格。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-08 13:27</div></div>
+      <div class="info-row"><div class="info-label">行数</div><div class="info-value normal">485 行</div></div>
+      <div class="info-row"><div class="info-label">依赖</div><div class="info-value normal">FastAPI + SQLAlchemy + Pydantic</div></div>
+      <div class="info-row"><div class="info-label">典型场景</div><div class="info-value normal">实现 Task 5 工具集（5 个 CRUD）</div></div>
+    </div>
+    <div class="update-log">
+      <span class="v">v1.1</span> (2026-08-08 14:00) — <strong>实战验证</strong>：成功生成 schedule 模块（7 文件、600 行、5 endpoint）
+    </div>
+    <div class="triggers">
+      <span class="trigger">用 fastapi-crud-generator</span>
+      <span class="trigger">生成 CRUD</span>
+      <span class="trigger">实现 XX 的 CRUD</span>
+      <span class="trigger">给 X 加增删改查</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-new">新增</span>
+      <span class="status status-verified">已实战</span>
+    </div>
+  </div>
+
+  <div class="skill-card highlight" data-search="langgraph agent builder 智能体 ReAct Plan-Execute 多轮推理">
+    <div class="skill-header">
+      <div class="skill-name">langgraph-agent-builder</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">构建 LangGraph 状态机 Agent（state + nodes + graph + FastAPI 集成），支持 ReAct / Plan-Execute / 多代理。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-08 13:35</div></div>
+      <div class="info-row"><div class="info-label">行数</div><div class="info-value normal">576 行</div></div>
+      <div class="info-row"><div class="info-label">依赖</div><div class="info-value normal">LangGraph + model router + tools</div></div>
+      <div class="info-row"><div class="info-label">典型场景</div><div class="info-value normal">Phase 2 Agent 引擎实现</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">用 langgraph-agent-builder</span>
+      <span class="trigger">构建 Agent</span>
+      <span class="trigger">实现 ReAct</span>
+      <span class="trigger">Plan-Execute</span>
+      <span class="trigger">多轮推理</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-new">新增</span>
+    </div>
+  </div>
+
+  <div class="skill-card highlight" data-search="fastapi test generator pytest 测试 覆盖率 单元测试 e2e">
+    <div class="skill-header">
+      <div class="skill-name">fastapi-test-generator</div>
+      <div class="skill-version upgraded">v1.1</div>
+    </div>
+    <div class="skill-desc">生成 pytest + httpx 测试套件（unit/integration/E2E），含 CRUD/Agent/Health 三类模式。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-08 13:38</div></div>
+      <div class="info-row"><div class="info-label">行数</div><div class="info-value normal">566 行</div></div>
+      <div class="info-row"><div class="info-label">依赖</div><div class="info-value normal">pytest-asyncio + SQLite + httpx</div></div>
+      <div class="info-row"><div class="info-label">典型场景</div><div class="info-value normal">Task 10 测试覆盖 / 新模块测试</div></div>
+    </div>
+    <div class="update-log">
+      <span class="v">v1.1</span> (2026-08-08 14:15) — <strong>实战验证</strong>：schedule 模块 32 测试 100% 通过，93% 覆盖率
+    </div>
+    <div class="triggers">
+      <span class="trigger">用 fastapi-test-generator</span>
+      <span class="trigger">给 XX 加测试</span>
+      <span class="trigger">写 pytest</span>
+      <span class="trigger">提升覆盖率</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-new">新增</span>
+      <span class="status status-verified">已实战</span>
+    </div>
+  </div>
+
+  <div class="skill-card highlight" data-search="project navigator html 项目导航 可视化看板 结构图">
+    <div class="skill-header">
+      <div class="skill-name">project-navigator-html</div>
+      <div class="skill-version upgraded">v1.1</div>
+    </div>
+    <div class="skill-desc">生成 d:\00-AI-project 风格工作区的单文件 HTML 可视化看板（含目录树/状态卡/Prompt 模板）。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-08 13:42</div></div>
+      <div class="info-row"><div class="info-label">行数</div><div class="info-value normal">366 行</div></div>
+      <div class="info-row"><div class="info-label">依赖</div><div class="info-value normal">纯静态 HTML，无外部依赖</div></div>
+      <div class="info-row"><div class="info-label">典型场景</div><div class="info-value normal">新会话恢复上下文 / 项目归档</div></div>
+    </div>
+    <div class="update-log">
+      <span class="v">v1.1</span> (2026-08-08 14:20) — <strong>实战验证</strong>：成功生成 1023 行 Skill 库看板 + 项目识别能力增强
+    </div>
+    <div class="triggers">
+      <span class="trigger">用 project-navigator-html</span>
+      <span class="trigger">生成项目导航</span>
+      <span class="trigger">可视化项目结构</span>
+      <span class="trigger">HTML 看图</span>
+      <span class="trigger">重新生成看板</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-new">新增</span>
+      <span class="status status-verified">已实战</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ Section 1.5: 股票专用 Skill ============ -->
+<h2>🎯 二、股票专用 Skill（大爷体系）</h2>
+<p class="section-desc">基于「大爷强化学习8课」个人交易体系 · 2026-08-09 创建</p>
+
+<div class="skill-grid">
+  <div class="skill-card highlight" data-search="daye faze 大爷法则 daye stock 股票 买点 强势结构 主力 洗盘 出货">
+    <div class="skill-header">
+      <div class="skill-name">daye-faze <span style="font-size:11px;color:var(--purple)">(大爷法则)</span></div>
+      <div class="skill-version upgraded">v0.2</div>
+    </div>
+    <div class="skill-desc">基于「大爷强化学习8课」体系分析个股：① 强势结构识别（底部箱体/趋势性碎步上行）② 5 类买点扫描（大长腿/低位反包/上影线+阳线/出坑换手/修复结构/主升浪）③ 持股三要素诊断（趋势/逻辑/主力）④ 主力行为阶段判断（建仓→拉升→洗盘→主升→出货）⑤ 个人纪律硬约束（仓位 40% / 不追高 7% / 周亏 -10% / 总回撤 -20%）</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-09 21:00（v0.1）→ 21:08（v0.2 升级）</div></div>
+      <div class="info-row"><div class="info-label">行数</div><div class="info-value normal">320 行</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">个人定制（基于「大爷强化学习8课」）</div></div>
+      <div class="info-row"><div class="info-label">3 种工作模式</div><div class="info-value normal">单股深度分析 / 批量扫描 / 持仓诊断</div></div>
+      <div class="info-row"><div class="info-label">依赖项目</div><div class="info-value normal">2026-08-09_股票市场分析</div></div>
+    </div>
+    <div class="update-log">
+      <span class="v">v0.2</span> (2026-08-09 21:08) — <strong>名称升级</strong>：daye-stock-analysis → 大爷法则（daye-faze），触发词全面替换为「大爷法则」
+    </div>
+    <div class="triggers">
+      <span class="trigger">大爷法则</span>
+      <span class="trigger">用大爷法则分析</span>
+      <span class="trigger">大爷视角看 X</span>
+      <span class="trigger">分析 X 股票</span>
+      <span class="trigger">X 是否能买</span>
+      <span class="trigger">扫描强势结构</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-new">新增</span>
+      <span class="status status-verified">实战（多氟多 002407）</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ Section 1.7: 部署/发布 Skill ============ -->
+<h2>🚀 三、部署/发布 Skill</h2>
+<p class="section-desc">看板自动化部署 · 2026-08-08 17:45 新增</p>
+
+<div class="skill-grid">
+  <div class="skill-card" style="border-color: var(--purple);">
+    <div class="skill-header">
+      <div class="skill-name">🚀 gh-pages-auto-deploy</div>
+      <div class="skill-version upgraded">v1.0</div>
+    </div>
+    <div class="skill-desc">自动将 03-Documents/ 下 3 个看板 HTML + 入口页 index.html 部署到 GitHub Pages（仓库 my-ai-board / 分支 gh-pages），全程通过 GitHub Git Database API（无需本地 git）</div>
+    <div class="skill-meta">
+      <span>📅 2026-08-08 17:45</span>
+      <span>📏 180 行</span>
+      <span>🎯 看板部署</span>
+    </div>
+    <div class="triggers">
+      <span class="trigger">同步看板</span>
+      <span class="trigger">更新 GitHub Pages</span>
+      <span class="trigger">重新部署看板</span>
+      <span class="trigger">部署到 GitHub</span>
+      <span class="trigger">把看板发到公网</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-new">新增</span>
+      <span class="status status-verified">已实战</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ Section 2: 通用方法论 Skill ============ -->
+<h2>📚 三、通用方法论 Skill</h2>
+<p class="section-desc">从 GitHub 安装的成熟方法论 Skill · 2026-08-07 部署</p>
+
+<div class="skill-grid">
+
+  <div class="skill-card" data-search="systematic debugging 调试 bug 二分查找 git bisect 复现">
+    <div class="skill-header">
+      <div class="skill-name">systematic-debugging</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">结构化调试方法论：复现 → 隔离 → 假设 → 验证。包含 git bisect 和二分查找。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">系统化调试</span>
+      <span class="trigger">复现 bug</span>
+      <span class="trigger">二分查找</span>
+      <span class="trigger">git bisect</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="writing commit messages conventional commits 提交信息 feat fix">
+    <div class="skill-header">
+      <div class="skill-name">writing-commit-messages</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">Conventional Commits 规范（feat/fix/refactor/perf 等 9 种类型）。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">写提交信息</span>
+      <span class="trigger">commit message</span>
+      <span class="trigger">conventional commits</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="verifying markdown formatting 格式检查 标题 列表 链接">
+    <div class="skill-header">
+      <div class="skill-name">verifying-markdown-formatting</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">Markdown 格式检查：标题层级/列表/链接/代码块/图片 alt 等。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">检查 markdown</span>
+      <span class="trigger">md 格式</span>
+      <span class="trigger">格式化验证</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="architecture decision records ADR 架构决策 文档化">
+    <div class="skill-header">
+      <div class="skill-name">architecture-decision-records</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">ADR 架构决策记录：Context/Options/Decision/Consequences 模板。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">写 ADR</span>
+      <span class="trigger">架构决策记录</span>
+      <span class="trigger">为什么选这个技术</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="fixing broken links 死链 404 链接修复">
+    <div class="skill-header">
+      <div class="skill-name">fixing-broken-links</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">扫描文档中所有 URL，用 curl 测试可达性，标记 404 并修复。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">检查死链</span>
+      <span class="trigger">修复链接</span>
+      <span class="trigger">链接 404</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="reviewing code 代码审查 review 质量 最佳实践">
+    <div class="skill-header">
+      <div class="skill-name">reviewing-code</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">全面代码审查：正确性/可维护性/性能/类型安全/测试覆盖。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">代码审查</span>
+      <span class="trigger">review 代码</span>
+      <span class="trigger">检查代码质量</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="prompt engineering 提示词 few-shot system prompt 思维链">
+    <div class="skill-header">
+      <div class="skill-name">prompt-engineering</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">LLM 提示工程：系统提示/few-shot/思维链/输出解析/JSON 模式。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">写提示词</span>
+      <span class="trigger">prompt 优化</span>
+      <span class="trigger">few-shot</span>
+      <span class="trigger">system prompt</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="incident response 事故响应 生产故障 postmortem 复盘 sev">
+    <div class="skill-header">
+      <div class="skill-name">incident-response</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">生产事故响应：SEV 分级 / 缓解 / 沟通 / 复盘（含 postmortem 模板）。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">spencerpauly/agent-skills</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">生产事故</span>
+      <span class="trigger">线上故障</span>
+      <span class="trigger">服务挂了</span>
+      <span class="trigger">写 postmortem</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="pdf 合并 拆分 ocr 表单 加密 解密">
+    <div class="skill-header">
+      <div class="skill-name">pdf</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">PDF 深度处理（合并/拆分/旋转/水印/OCR/表单/加密），基于 pypdf。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">Anthropic 官方</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">处理 PDF</span>
+      <span class="trigger">PDF 转 Word</span>
+      <span class="trigger">合并 PDF</span>
+      <span class="trigger">PDF 拆分</span>
+      <span class="trigger">OCR PDF</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="doc coauthoring 文档协作 prd rfc 技术方案">
+    <div class="skill-header">
+      <div class="skill-name">doc-coauthoring</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">文档协作三阶段：Context Gathering → Refinement → Reader Testing。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">Anthropic 官方</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">协作写文档</span>
+      <span class="trigger">写技术方案</span>
+      <span class="trigger">PRD</span>
+      <span class="trigger">RFC</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ Section 3: 内容生成 Skill ============ -->
+<h2>🎨 四、内容生成 Skill</h2>
+<p class="section-desc">演示文稿 / 思维导图 / 可视化看板 · 已实战验证</p>
+
+<div class="skill-grid">
+
+  <div class="skill-card" data-search="generate presentation 演示文稿 ppt 幻灯片 markdown html pdf">
+    <div class="skill-header">
+      <div class="skill-name">markdown-to-html-ppt <span style="font-size:11px;color:var(--warning);">(原 generate-presentation)</span></div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">markdown → HTML + PDF 双格式演示文稿，1920×1080 16:9，支持键盘导航。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">nhype/presentation-generation-skill</div></div>
+      <div class="info-row"><div class="info-label">实战</div><div class="info-value normal" style="color: var(--success);">GMP 项目验证</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">生成 PPT</span>
+      <span class="trigger">做演示文稿</span>
+      <span class="trigger">幻灯片</span>
+      <span class="trigger">markdown 转 PPT</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+  <div class="skill-card" data-search="mind map mermaid mindmap 思维导图 概念图">
+    <div class="skill-header">
+      <div class="skill-name">mind-map</div>
+      <div class="skill-version">v1.0</div>
+    </div>
+    <div class="skill-desc">Mermaid mindmap 思维导图生成（2-4 层分支），GitHub 兼容渲染。</div>
+    <div class="skill-info">
+      <div class="info-row"><div class="info-label">安装时间</div><div class="info-value">2026-08-07</div></div>
+      <div class="info-row"><div class="info-label">来源</div><div class="info-value normal">mblode/agent-skills</div></div>
+      <div class="info-row"><div class="info-label">实战</div><div class="info-value normal" style="color: var(--success);">GMP 项目验证</div></div>
+    </div>
+    <div class="triggers">
+      <span class="trigger">做思维导图</span>
+      <span class="trigger">mermaid mindmap</span>
+      <span class="trigger">分支图</span>
+      <span class="trigger">概念图</span>
+    </div>
+    <div class="status-row">
+      <span class="status status-stable">稳定</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ Section 4: Cursor 内置 Skill ============ -->
+<h2>⚙️ 五、Cursor 内置 Skill（不可编辑）</h2>
+<p class="section-desc">随 Cursor IDE 自带 · 路径：~/.cursor/skills-cursor/</p>
+
+<div class="skill-grid">
+
+  <div class="skill-card" data-search="canvas 画布 .canvas.tsx react 数据可视化">
+    <div class="skill-header">
+      <div class="skill-name">canvas</div>
+      <div class="skill-version">内置</div>
+    </div>
+    <div class="skill-desc">生成 .canvas.tsx 实时 React 应用，适合结构化分析/数据可视化。</div>
+    <div class="triggers">
+      <span class="trigger">用 canvas</span>
+      <span class="trigger">画布</span>
+    </div>
+    <div class="status-row"><span class="status status-builtin">内置</span></div>
+  </div>
+
+  <div class="skill-card" data-search="automate automation 自动化任务 定时">
+    <div class="skill-header">
+      <div class="skill-name">automate</div>
+      <div class="skill-version">内置</div>
+    </div>
+    <div class="skill-desc">创建 Cursor Automations 自动化任务（定时/CI 触发）。</div>
+    <div class="triggers">
+      <span class="trigger">创建 automation</span>
+      <span class="trigger">自动化</span>
+    </div>
+    <div class="status-row"><span class="status status-builtin">内置</span></div>
+  </div>
+
+  <div class="skill-card" data-search="create rule .cursor/rules AGENTS.md 项目规则">
+    <div class="skill-header">
+      <div class="skill-name">create-rule</div>
+      <div class="skill-version">内置</div>
+    </div>
+    <div class="skill-desc">创建项目级 AI 规则（.cursor/rules/ 或 AGENTS.md）。</div>
+    <div class="triggers">
+      <span class="trigger">创建规则</span>
+      <span class="trigger">.cursor/rules</span>
+    </div>
+    <div class="status-row"><span class="status status-builtin">内置</span></div>
+  </div>
+
+  <div class="skill-card" data-search="create skill SKILL.md 创建 编写">
+    <div class="skill-header">
+      <div class="skill-name">create-skill</div>
+      <div class="skill-version">内置</div>
+    </div>
+    <div class="skill-desc">Cursor Skill 创建完整指南（frontmatter / workflow / 反模式）。</div>
+    <div class="triggers">
+      <span class="trigger">创建 Skill</span>
+      <span class="trigger">SKILL.md</span>
+    </div>
+    <div class="status-row"><span class="status status-builtin">内置</span></div>
+  </div>
+
+  <div class="skill-card" data-search="loop 定时 循环 /loop 间隔">
+    <div class="skill-header">
+      <div class="skill-name">loop</div>
+      <div class="skill-version">内置</div>
+    </div>
+    <div class="skill-desc">在当前会话中按间隔重复执行 prompt 或 skill（/loop 5m /foo）。</div>
+    <div class="triggers">
+      <span class="trigger">/loop</span>
+      <span class="trigger">定时循环</span>
+    </div>
+    <div class="status-row"><span class="status status-builtin">内置</span></div>
+  </div>
+
+  <div class="skill-card" data-search="review pr 审查 merge ci">
+    <div class="skill-header">
+      <div class="skill-name">review</div>
+      <div class="skill-version">内置</div>
+    </div>
+    <div class="skill-desc">PR 审查与合并就绪维护。</div>
+    <div class="triggers">
+      <span class="trigger">PR review</span>
+    </div>
+    <div class="status-row"><span class="status status-builtin">内置</span></div>
+  </div>
+
+</div>
+
+<p class="section-desc" style="margin-top: 12px;">还有 14 个内置 Skill: autopilot · create-hook · create-subagent · migrate-to-skills · onboard · rename-chat · review-bugbot · review-security · sdk · shell · split-to-prs · statusline · update-cli-config · update-cursor-settings</p>
+
+<!-- ============ Section 4.5: Anthropic 官方批次 ============ -->
+<h2>🆕 五·b、Anthropic 官方批次 v2026-08-09</h2>
+<p class="section-desc">从 <a href="https://github.com/anthropics/skills/tree/main/skills" style="color:var(--accent);">anthropics/skills</a> 一次性补齐 14 个官方 Skill · 备份：<code>_archive/2026-08-09-pre-anthropic-batch/</code></p>
+
+<div class="skill-grid">
+  <div class="skill-card" data-search="docx Word 文档 .docx .dotx">
+    <div class="skill-header"><div class="skill-name">docx</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">Word 文档创建/读取/编辑/操作（.docx / .dotx），含 TOC/页眉/页脚/图片/跟踪更改。</div>
+    <div class="triggers"><span class="trigger">处理 Word</span><span class="trigger">.docx</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="xlsx Excel 表格 .xlsx .csv">
+    <div class="skill-header"><div class="skill-name">xlsx</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">Excel 与 CSV 创建/读取/编辑（公式/格式化/图表/数据清洗）。</div>
+    <div class="triggers"><span class="trigger">处理 Excel</span><span class="trigger">.xlsx</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="pptx PowerPoint 幻灯片 .pptx .potx">
+    <div class="skill-header"><div class="skill-name">pptx</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">PowerPoint 创建/读取/编辑/合并/拆分（.pptx / .potx），含模板/版式/演讲者备注。</div>
+    <div class="triggers"><span class="trigger">做 PPT</span><span class="trigger">.pptx</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="skill-creator 创建 优化 评估">
+    <div class="skill-header"><div class="skill-name">skill-creator</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">新建/修改 Skill + 评估 + 优化 description 触发准确率（⭐⭐⭐ 系统化方法论）。</div>
+    <div class="triggers"><span class="trigger">创建 Skill</span><span class="trigger">优化 Skill</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="mcp-builder MCP 服务器 FastMCP">
+    <div class="skill-header"><div class="skill-name">mcp-builder</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">构建 MCP 服务器集成外部 API（Python FastMCP / Node MCP SDK）。</div>
+    <div class="triggers"><span class="trigger">MCP 服务器</span><span class="trigger">建 MCP</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="frontend-design 前端 UI 美学">
+    <div class="skill-header"><div class="skill-name">frontend-design</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">独特且有意图的前端设计（排版/美学方向/避免模板默认）。</div>
+    <div class="triggers"><span class="trigger">前端设计</span><span class="trigger">UI 美学</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="canvas-design 海报 视觉艺术">
+    <div class="skill-header"><div class="skill-name">canvas-design</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">用设计哲学创作 .png / .pdf 视觉艺术（海报/设计稿）。</div>
+    <div class="triggers"><span class="trigger">做海报</span><span class="trigger">设计图</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="web-artifacts-builder React Tailwind shadcn">
+    <div class="skill-header"><div class="skill-name">web-artifacts-builder</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">复杂 claude.ai HTML artifacts（React + Tailwind + shadcn/ui + 路由）。</div>
+    <div class="triggers"><span class="trigger">做 artifacts</span><span class="trigger">React artifact</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="webapp-testing Playwright 浏览器">
+    <div class="skill-header"><div class="skill-name">webapp-testing</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">用 Playwright 测试本地 Web 应用（截图/调试 UI/查看 console 日志）。</div>
+    <div class="triggers"><span class="trigger">Playwright 测试</span><span class="trigger">网页测试</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="theme-factory 主题 样式">
+    <div class="skill-header"><div class="skill-name">theme-factory</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">10 套预置主题 + 自定义主题（颜色/字体），适用于 slides/docs/landing pages。</div>
+    <div class="triggers"><span class="trigger">换主题</span><span class="trigger">主题样式</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="brand-guidelines 品牌色 视觉规范">
+    <div class="skill-header"><div class="skill-name">brand-guidelines</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">应用 Anthropic 官方品牌色与排版（参考用，需本地化）。</div>
+    <div class="triggers"><span class="trigger">品牌色</span><span class="trigger">公司视觉</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="claude-api Claude API SDK">
+    <div class="skill-header"><div class="skill-name">claude-api</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">Claude API / SDK 使用（Python/TypeScript/Node）。</div>
+    <div class="triggers"><span class="trigger">Claude API</span><span class="trigger">Anthropic SDK</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="internal-comms 内部沟通 状态报告">
+    <div class="skill-header"><div class="skill-name">internal-comms</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">内部沟通模板（status report / 3P / newsletter / FAQ / incident report）。</div>
+    <div class="triggers"><span class="trigger">状态报告</span><span class="trigger">项目周报</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+  <div class="skill-card" data-search="algorithmic-art 算法艺术 p5.js">
+    <div class="skill-header"><div class="skill-name">algorithmic-art</div><div class="skill-version">v1.0</div></div>
+    <div class="skill-desc">用 p5.js + 种子随机性 + 交互参数创作算法艺术。</div>
+    <div class="triggers"><span class="trigger">生成艺术</span><span class="trigger">粒子系统</span></div>
+    <div class="status-row"><span class="status status-installed">已装</span></div>
+  </div>
+</div>
+
+<!-- ============ Section 5: 工作流联动 ============ -->
+<h2>🔄 六、Skill 协同工作流</h2>
+<p class="section-desc">项目内 4 个自定义 Skill 的推荐调用顺序（含已实战验证的部分）</p>
+
+<div class="workflow">
+  <div class="workflow-step">
+    <span class="step-box purple">fastapi-crud-generator</span>
+    <span class="step-arrow">→</span>
+    <span class="step-box">生成 5 个工具 CRUD<br>(schedule ✅ task note email search)</span>
+  </div>
+  <div class="workflow-step" style="margin-left: 24px;">
+    <span class="step-arrow">↓</span>
+  </div>
+  <div class="workflow-step" style="margin-left: 24px;">
+    <span class="step-box purple">langgraph-agent-builder</span>
+    <span class="step-arrow">→</span>
+    <span class="step-box">把工具接入 Agent<br>(ReAct 推理循环)</span>
+  </div>
+  <div class="workflow-step" style="margin-left: 24px;">
+    <span class="step-arrow">↓</span>
+  </div>
+  <div class="workflow-step" style="margin-left: 24px;">
+    <span class="step-box purple">fastapi-test-generator</span>
+    <span class="step-arrow">→</span>
+    <span class="step-box">为所有 endpoint 生成测试<br>(unit + integration ✅)</span>
+  </div>
+  <div class="workflow-step" style="margin-left: 24px;">
+    <span class="step-arrow">↓</span>
+  </div>
+  <div class="workflow-step" style="margin-left: 24px;">
+    <span class="step-box purple">project-navigator-html</span>
+    <span class="step-arrow">→</span>
+    <span class="step-box">生成项目总览 HTML<br>(新会话快速恢复上下文 ✅)</span>
+  </div>
+</div>
+
+<!-- ============ Section 6: 更新日志 ============ -->
+<h2>📅 七、更新日志</h2>
+<p class="section-desc">维护规则：每次新增/更新/删除 Skill 时，同步 <code>00-meta/skill-registry.md</code> + 重新生成本看板</p>
+
+<div class="timeline">
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-09 22:30</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">从 <strong>anthropics/skills</strong> 克隆 <strong>14 个官方 Skill</strong>（docx/xlsx/pptx/skill-creator/mcp-builder/frontend-design/canvas-design/web-artifacts-builder/webapp-testing/theme-factory/brand-guidelines/claude-api/internal-comms/algorithmic-art），自定义 Skill 16 → 31</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-09 22:30</div>
+    <div class="timeline-badge"><span class="badge-update">重命名</span></div>
+    <div class="timeline-event"><strong>generate-presentation → markdown-to-html-ppt</strong>（避免与官方 pptx 触发词冲突，输出 HTML+PDF）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-09 22:30</div>
+    <div class="timeline-badge"><span class="badge-doc">文档</span></div>
+    <div class="timeline-event">更新 Skill 库可视化看板 <strong>v4.0</strong> + skill-registry.md 同步新增 14 个 + 1 个重命名</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-09 22:30</div>
+    <div class="timeline-badge"><span class="badge-verify">实战</span></div>
+    <div class="timeline-event">看板 v2.4 + 收工归档 + token 写入 + 4 文件部署完成</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 17:45</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">新增 <strong>gh-pages-auto-deploy v1.0</strong> — 看板自动同步到 GitHub Pages（含 Token 安全约束）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 17:30</div>
+    <div class="timeline-badge"><span class="badge-verify">实战</span></div>
+    <div class="timeline-event">首次部署 <strong>my-ai-board</strong> 到 GitHub Pages（3 看板 + index.html，4 文件，1 分钟内上线）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 14:20</div>
+    <div class="timeline-badge"><span class="badge-doc">文档</span></div>
+    <div class="timeline-event">更新 Skill 库可视化看板 <strong>v2</strong>（同步 3 个 Skill 升级到 v1.1）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 14:15</div>
+    <div class="timeline-badge"><span class="badge-verify">实战</span></div>
+    <div class="timeline-event"><strong>fastapi-test-generator v1.1</strong>：schedule 模块 32 测试 100% 通过，93% 覆盖率</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 14:00</div>
+    <div class="timeline-badge"><span class="badge-verify">实战</span></div>
+    <div class="timeline-event"><strong>fastapi-crud-generator v1.1</strong>：成功生成 schedule 模块（7 文件、600 行、5 endpoint）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 13:42</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">创建 <strong>project-navigator-html</strong> Skill v1.0（366 行）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 13:38</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">创建 <strong>fastapi-test-generator</strong> Skill v1.0（566 行）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 13:35</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">创建 <strong>langgraph-agent-builder</strong> Skill v1.0（576 行）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 13:27</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">创建 <strong>fastapi-crud-generator</strong> Skill v1.0（485 行）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-08 13:25</div>
+    <div class="timeline-badge"><span class="badge-doc">文档</span></div>
+    <div class="timeline-event">创建 Skill 元数据源 <code>00-meta/skill-registry.md</code></div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-07</div>
+    <div class="timeline-badge"><span class="badge-verify">实战</span></div>
+    <div class="timeline-event">PPT 联动项目验证 <strong>generate-presentation</strong> + <strong>mind-map</strong>（33 页 → 12 页精要 + 思维导图）</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">2026-08-07</div>
+    <div class="timeline-badge"><span class="badge-add">新增</span></div>
+    <div class="timeline-event">安装 12 个 Skill：9 个 spencerpauly + 2 个 Anthropic + 1 个 nhype</div>
+  </div>
+</div>
+
+<!-- ============ Section 7: 维护流程 ============ -->
+<h2>🛠️ 八、Skill 维护流程</h2>
+
+<div class="tip">
+  <div class="tip-title">➕ 新增 Skill 时</div>
+  <div class="tip-content">
+    1. 在 <code>~/.cursor/skills/&lt;name&gt;/SKILL.md</code> 创建文件<br>
+    2. 在 <code>00-meta/skill-registry.md</code> 对应分类下添加条目（安装时间、触发词、功能、版本）<br>
+    3. 重新运行 <code>project-navigator-html</code> 生成最新看板
+  </div>
+</div>
+
+<div class="tip">
+  <div class="tip-title">🔄 更新 Skill 时</div>
+  <div class="tip-content">
+    1. 修改 <code>~/.cursor/skills/&lt;name&gt;/SKILL.md</code> 内容<br>
+    2. 提升版本号（如 v1.0 → v1.1）<br>
+    3. 在「更新记录」中追加新版本说明<br>
+    4. 重新生成看板
+  </div>
+</div>
+
+<div class="tip">
+  <div class="tip-title">🗑️ 删除 Skill 时</div>
+  <div class="tip-content">
+    1. 删除 <code>~/.cursor/skills/&lt;name&gt;/</code> 目录<br>
+    2. 在 <code>skill-registry.md</code> 移除条目<br>
+    3. 在「更新日志」记录删除事件<br>
+    4. 重新生成看板
+  </div>
+</div>
+
+<div class="tip">
+  <div class="tip-title">📊 重新生成本看板的命令</div>
+  <div class="tip-content">
+    下次新会话时，对 AI 说：<br>
+    <code>用 project-navigator-html 重新生成 Skill 库看板</code><br>
+    AI 会读取 <code>00-meta/skill-registry.md</code> 最新数据 + 重新扫描 <code>~/.cursor/skills/</code> 目录，生成最新版 HTML。
+  </div>
+</div>
+
+<footer>
+  <p>Generated by <strong>project-navigator-html</strong> v1.1 · 2026-08-08 14:20 · d:\00-AI-project</p>
+  <p style="margin-top: 4px;">数据源：<code>00-meta/skill-registry.md</code> · 下次更新时同步修改该文件 + 重跑本看板生成</p>
+</footer>
+
+</div>
+
+<script>
+  const filterInput = document.getElementById('filterInput');
+  const skillCards = document.querySelectorAll('.skill-card');
+
+  filterInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    skillCards.forEach(card => {
+      const searchData = card.getAttribute('data-search') || '';
+      const cardText = card.textContent.toLowerCase();
+      const match = !query || searchData.includes(query) || cardText.includes(query);
+      card.style.display = match ? '' : 'none';
+    });
+  });
+</script>
+
+
+<script>
+// 密码 "770880" 的 SHA-256 哈希（前端比对，不存明文）
+const PW_HASH = '84eee289aaed0156541b079cd0cff292211a21339796f47c58e17f2c93d3b07a';
+
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+const pwInput = document.getElementById('pw');
+const pwBtn = document.getElementById('pwBtn');
+const pwMsg = document.getElementById('pwMsg');
+const gate = document.getElementById('gate');
+
+// 已通过认证则直接跳过（同一会话）
+if(sessionStorage.getItem('aiboard_auth')==='1'){
+  gate.style.display='none';
+}
+
+async function checkPw(){
+  const v = pwInput.value.trim();
+  if(v.length!==6){
+    pwMsg.textContent='请输入 6 位密码';
+    pwInput.classList.add('error');
+    setTimeout(()=>pwInput.classList.remove('error'),400);
+    return;
+  }
+  const h = await sha256(v);
+  if(h === PW_HASH){
+    sessionStorage.setItem('aiboard_auth','1');
+    gate.style.display='none';
+    pwInput.value='';
+    pwMsg.textContent='';
+  } else {
+    pwMsg.textContent='密码错误';
+    pwInput.classList.add('error');
+    setTimeout(()=>pwInput.classList.remove('error'),400);
+    pwInput.value='';
+    pwInput.focus();
+  }
+}
+
+if(pwBtn){ pwBtn.addEventListener('click', checkPw); }
+if(pwInput){ pwInput.addEventListener('keypress', e=>{ if(e.key==='Enter') checkPw(); }); pwInput.focus(); }
+</script>
+</body>
+</html>
